@@ -2,6 +2,12 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
+import {
+  handleBiomimicryAnalysis,
+  handleOrganismSearch,
+  handleGetOrganisms,
+  handleGetOrganism,
+} from "./routes/biomimicry";
 
 export function createServer() {
   const app = express();
@@ -18,6 +24,12 @@ export function createServer() {
   });
 
   app.get("/api/demo", handleDemo);
+
+  // Biomimicry Architect API routes
+  app.post("/api/biomimicry/analyze", handleBiomimicryAnalysis);
+  app.get("/api/organisms/search", handleOrganismSearch);
+  app.get("/api/organisms", handleGetOrganisms);
+  app.get("/api/organisms/:id", handleGetOrganism);
 
   return app;
 }
