@@ -18,7 +18,8 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
 
     // Scene setup
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xf8f9fa);
+    scene.background = new THREE.Color(0xf0f4f8);
+    scene.fog = new THREE.Fog(0xf0f4f8, 50, 200);
     sceneRef.current = scene;
 
     // Camera setup
@@ -28,420 +29,89 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
       0.1,
       1000
     );
-    camera.position.z = 6;
+    camera.position.set(0, 0, 8);
     cameraRef.current = camera;
 
-    // Renderer setup
+    // Renderer setup - Enhanced for better quality
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(
       containerRef.current.clientWidth,
       containerRef.current.clientHeight
     );
     renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
     renderer.pixelRatio = Math.min(window.devicePixelRatio, 2);
     containerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+    // Enhanced Lighting - 3-point light setup
+    const keyLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    keyLight.position.set(10, 10, 10);
+    keyLight.castShadow = true;
+    keyLight.shadow.mapSize.set(2048, 2048);
+    scene.add(keyLight);
+
+    const fillLight = new THREE.DirectionalLight(0x4a90e2, 0.5);
+    fillLight.position.set(-8, 5, 8);
+    scene.add(fillLight);
+
+    const backLight = new THREE.DirectionalLight(0xff6b9d, 0.3);
+    backLight.position.set(0, -10, -10);
+    scene.add(backLight);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
-    directionalLight.position.set(8, 8, 8);
-    directionalLight.castShadow = true;
-    directionalLight.shadow.mapSize.width = 2048;
-    directionalLight.shadow.mapSize.height = 2048;
-    scene.add(directionalLight);
+    // Add ground plane for shadows
+    const groundGeometry = new THREE.PlaneGeometry(50, 50);
+    const groundMaterial = new THREE.ShadowMaterial({ opacity: 0.2 });
+    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -3;
+    ground.receiveShadow = true;
+    scene.add(ground);
 
-    // Create organism-specific 3D models
+    // Create model
+    const model = new THREE.Group();
+    modelRef.current = model;
+    scene.add(model);
+
+    // Create organism-specific models
     const createOrganismModel = () => {
-      const group = new THREE.Group();
-
       if (organism?.includes("Termite")) {
-        // Termite Mound: Spiral ventilation structure
-        createTermiteMound(group);
+        createTermiteMound(model);
       } else if (organism?.includes("Gecko")) {
-        // Gecko Feet: Micro-bristle arrays
-        createGeckoFeet(group);
+        createGeckoFeet(model);
       } else if (organism?.includes("Whale")) {
-        // Whale Fins: Tubercle-patterned blade
-        createWhaleBlade(group);
+        createWhaleBlade(model);
       } else if (organism?.includes("Lotus")) {
-        // Lotus Leaf: Wavy hydrophobic surface
-        createLotusLeaf(group);
+        createLotusLeaf(model);
       } else if (organism?.includes("Spider")) {
-        // Spider Web Silk: Woven fiber structure
-        createSpiderWeb(group);
+        createSpiderWeb(model);
       } else if (organism?.includes("Abalone")) {
-        // Abalone Shell: Layered nacre structure
-        createAbalonShell(group);
+        createAbalonShell(model);
       } else if (organism?.includes("Butterfly")) {
-        // Butterfly Wing: Colorful scale pattern
-        createButterflyWing(group);
+        createButterflyWing(model);
+      } else if (organism?.includes("Moth")) {
+        createMothEye(model);
+      } else if (organism?.includes("Shark")) {
+        createSharkSkin(model);
+      } else if (organism?.includes("Bone")) {
+        createBoneModel(model);
+      } else if (organism?.includes("Honeycomb")) {
+        createHoneycomb(model);
       } else {
-        // Default: Organic blob
-        createDefaultOrganism(group);
-      }
-
-      return group;
-    };
-
-    const createTermiteMound = (group: THREE.Group) => {
-      // Central spiral structure
-      const spiralCurve = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(0, -2, 0),
-        new THREE.Vector3(1.5, -1.5, 0),
-        new THREE.Vector3(2, -0.5, 1),
-        new THREE.Vector3(1.8, 0.5, 1.5),
-        new THREE.Vector3(1, 1.5, 1.2),
-        new THREE.Vector3(0, 2, 0),
-      ]);
-
-      const tubeGeometry = new THREE.TubeGeometry(spiralCurve, 20, 0.4, 6);
-      const tubeMaterial = new THREE.MeshPhongMaterial({
-        color: 0x8B4513,
-        emissive: 0x3d2817,
-      });
-      const tube = new THREE.Mesh(tubeGeometry, tubeMaterial);
-      tube.castShadow = true;
-      group.add(tube);
-
-      // Branching ventilation channels
-      for (let i = 0; i < 8; i++) {
-        const angle = (i / 8) * Math.PI * 2;
-        const height = Math.sin(i / 8 * Math.PI) * 2;
-        const channelGeometry = new THREE.CylinderGeometry(0.2, 0.15, 1.5, 12);
-        const channelMaterial = new THREE.MeshPhongMaterial({
-          color: 0x9B5523,
-          emissive: 0x4d2817,
-        });
-        const channel = new THREE.Mesh(channelGeometry, channelMaterial);
-        channel.position.set(
-          Math.cos(angle) * 2.2,
-          height - 0.5,
-          Math.sin(angle) * 2.2
-        );
-        channel.rotation.z = angle + Math.PI / 2;
-        channel.castShadow = true;
-        group.add(channel);
-      }
-
-      // Central mound body
-      const moundGeometry = new THREE.SphereGeometry(1.5, 32, 32);
-      const moundMaterial = new THREE.MeshPhongMaterial({
-        color: 0xA0522D,
-        emissive: 0x5d2917,
-      });
-      const mound = new THREE.Mesh(moundGeometry, moundMaterial);
-      mound.scale.y = 1.3;
-      mound.castShadow = true;
-      group.add(mound);
-    };
-
-    const createGeckoFeet = (group: THREE.Group) => {
-      // Main foot pad
-      const padGeometry = new THREE.BoxGeometry(2, 1.2, 0.5);
-      const padMaterial = new THREE.MeshPhongMaterial({
-        color: 0xD4A574,
-        emissive: 0x6a5438,
-      });
-      const pad = new THREE.Mesh(padGeometry, padMaterial);
-      pad.castShadow = true;
-      group.add(pad);
-
-      // Micro-scale bristles (setae)
-      const bristleGeometry = new THREE.ConeGeometry(0.08, 1.2, 8);
-      const bristleMaterial = new THREE.MeshPhongMaterial({
-        color: 0xA68B5B,
-      });
-
-      for (let x = -0.9; x <= 0.9; x += 0.3) {
-        for (let z = -0.2; z <= 0.2; z += 0.15) {
-          const bristle = new THREE.Mesh(bristleGeometry, bristleMaterial);
-          bristle.position.set(x, 0.7, z);
-          bristle.castShadow = true;
-          group.add(bristle);
-        }
-      }
-
-      // Sub-bristles on main bristles for hierarchy
-      const subBristleGeometry = new THREE.ConeGeometry(0.03, 0.6, 6);
-      const subBristleMaterial = new THREE.MeshPhongMaterial({
-        color: 0x8B7355,
-      });
-
-      for (let x = -0.6; x <= 0.6; x += 0.6) {
-        for (let z = -0.1; z <= 0.1; z += 0.1) {
-          const subbristle = new THREE.Mesh(subBristleGeometry, subBristleMaterial);
-          subbristle.position.set(x, 1.4, z);
-          subbristle.scale.set(0.5, 0.5, 0.5);
-          subbristle.castShadow = true;
-          group.add(subbristle);
-        }
+        createDefaultOrganism(model);
       }
     };
 
-    const createWhaleBlade = (group: THREE.Group) => {
-      // Main blade
-      const bladeShape = new THREE.Shape();
-      bladeShape.ellipse(1.8, 0.6, 0, Math.PI * 2);
-      const bladeGeometry = new THREE.ShapeGeometry(bladeShape);
-      const bladeMaterial = new THREE.MeshPhongMaterial({
-        color: 0x4A90E2,
-        emissive: 0x1e3a8a,
-      });
-      const blade = new THREE.Mesh(bladeGeometry, bladeMaterial);
-      blade.position.z = 0.05;
-      blade.castShadow = true;
-      group.add(blade);
+    createOrganismModel();
 
-      // Tubercles on leading edge
-      const tubercleGeometry = new THREE.SphereGeometry(0.22, 16, 16);
-      const tubercleMaterial = new THREE.MeshPhongMaterial({
-        color: 0x2E5C8A,
-        emissive: 0x0f2f4a,
-      });
-
-      for (let i = 0; i < 14; i++) {
-        const x = (i / 13) * 3.2 - 1.6;
-        const tubercle = new THREE.Mesh(tubercleGeometry, tubercleMaterial);
-        tubercle.position.set(x, 0.7, 0.1);
-        tubercle.scale.set(1, 0.8, 0.6);
-        tubercle.castShadow = true;
-        group.add(tubercle);
-      }
-
-      // Fin structure details
-      const ribGeometry = new THREE.CylinderGeometry(0.08, 0.08, 1.2, 8);
-      const ribMaterial = new THREE.MeshPhongMaterial({
-        color: 0x3a5f7d,
-      });
-
-      for (let i = 0; i < 8; i++) {
-        const x = (i / 7) * 3 - 1.5;
-        const rib = new THREE.Mesh(ribGeometry, ribMaterial);
-        rib.position.set(x, 0, 0.02);
-        rib.rotation.z = Math.PI / 2;
-        rib.castShadow = true;
-        group.add(rib);
-      }
-    };
-
-    const createLotusLeaf = (group: THREE.Group) => {
-      // Main leaf surface with bumps
-      const leafGeometry = new THREE.PlaneGeometry(3, 3, 20, 20);
-      const leafPositions = leafGeometry.attributes.position;
-      const positionArray = leafPositions.array as Float32Array;
-
-      // Add wavy bumps
-      for (let i = 0; i < positionArray.length; i += 3) {
-        const x = positionArray[i];
-        const y = positionArray[i + 1];
-        const z = positionArray[i + 2];
-
-        positionArray[i + 2] =
-          z +
-          Math.sin(x * 2) * 0.3 +
-          Math.cos(y * 2) * 0.3 +
-          Math.random() * 0.1;
-      }
-      leafPositions.needsUpdate = true;
-      leafGeometry.computeVertexNormals();
-
-      const leafMaterial = new THREE.MeshPhongMaterial({
-        color: 0x2ECC71,
-        emissive: 0x1a7a42,
-        shininess: 100,
-      });
-      const leaf = new THREE.Mesh(leafGeometry, leafMaterial);
-      leaf.castShadow = true;
-      leaf.receiveShadow = true;
-      group.add(leaf);
-
-      // Micro-bumps for hydrophobic effect
-      const bumpGeometry = new THREE.SphereGeometry(0.15, 12, 12);
-      const bumpMaterial = new THREE.MeshPhongMaterial({
-        color: 0x27AE60,
-        emissive: 0x1a5f3a,
-      });
-
-      for (let x = -1.4; x <= 1.4; x += 0.6) {
-        for (let y = -1.4; y <= 1.4; y += 0.6) {
-          const bump = new THREE.Mesh(bumpGeometry, bumpMaterial);
-          bump.position.set(x, y, 0.5 + Math.random() * 0.2);
-          bump.castShadow = true;
-          group.add(bump);
-        }
-      }
-    };
-
-    const createSpiderWeb = (group: THREE.Group) => {
-      // Radial threads
-      const threadMaterial = new THREE.LineBasicMaterial({
-        color: 0xE8E8E8,
-        linewidth: 2,
-      });
-
-      for (let i = 0; i < 16; i++) {
-        const angle = (i / 16) * Math.PI * 2;
-        const points = [];
-
-        for (let r = 0; r <= 2; r += 0.3) {
-          points.push(
-            new THREE.Vector3(
-              Math.cos(angle) * r,
-              Math.sin(angle) * r,
-              0
-            )
-          );
-        }
-
-        const geometry = new THREE.BufferGeometry().setFromPoints(points);
-        const line = new THREE.Line(geometry, threadMaterial);
-        group.add(line);
-      }
-
-      // Spiral threads
-      const spiralPoints = [];
-      for (let i = 0; i < 100; i++) {
-        const angle = (i / 100) * Math.PI * 8;
-        const radius = (i / 100) * 2;
-        spiralPoints.push(
-          new THREE.Vector3(
-            Math.cos(angle) * radius,
-            Math.sin(angle) * radius,
-            0
-          )
-        );
-      }
-
-      const spiralGeometry = new THREE.BufferGeometry().setFromPoints(spiralPoints);
-      const spiral = new THREE.Line(spiralGeometry, threadMaterial);
-      group.add(spiral);
-
-      // Droplets on web
-      const dropletGeometry = new THREE.SphereGeometry(0.12, 12, 12);
-      const dropletMaterial = new THREE.MeshPhongMaterial({
-        color: 0xB0E0E6,
-        emissive: 0x4a7c8e,
-      });
-
-      for (let i = 0; i < 20; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const radius = Math.random() * 1.8;
-        const droplet = new THREE.Mesh(dropletGeometry, dropletMaterial);
-        droplet.position.set(
-          Math.cos(angle) * radius,
-          Math.sin(angle) * radius,
-          0.2
-        );
-        droplet.castShadow = true;
-        group.add(droplet);
-      }
-    };
-
-    const createAbalonShell = (group: THREE.Group) => {
-      // Layered nacre structure
-      const layers = 5;
-      for (let layer = 0; layer < layers; layer++) {
-        const shellGeometry = new THREE.BoxGeometry(
-          2.5 - layer * 0.3,
-          1.8 - layer * 0.25,
-          0.15
-        );
-        const shellColor = new THREE.Color(
-          0xffffff
-        ).lerpColors(
-          new THREE.Color(0x4B0082),
-          new THREE.Color(0xFFFFFF),
-          layer / layers
-        );
-        const shellMaterial = new THREE.MeshPhongMaterial({
-          color: shellColor,
-          emissive: shellColor.clone().multiplyScalar(0.3),
-          shininess: 120,
-        });
-        const shell = new THREE.Mesh(shellGeometry, shellMaterial);
-        shell.position.z = layer * 0.2;
-        shell.rotation.z = (layer * Math.PI) / 20;
-        shell.castShadow = true;
-        group.add(shell);
-      }
-
-      // Iridescent coating suggestion
-      const iridGeometry = new THREE.SphereGeometry(1.2, 32, 32);
-      const iridMaterial = new THREE.MeshStandardMaterial({
-        color: 0x00CED1,
-        metalness: 0.6,
-        roughness: 0.3,
-      });
-      const iridescence = new THREE.Mesh(iridGeometry, iridMaterial);
-      iridescence.scale.set(0.9, 0.7, 0.08);
-      iridescence.castShadow = true;
-      group.add(iridescence);
-    };
-
-    const createButterflyWing = (group: THREE.Group) => {
-      // Wing body
-      const wingGeometry = new THREE.PlaneGeometry(2.5, 3);
-      const wingMaterial = new THREE.MeshPhongMaterial({
-        color: 0xFF6B9D,
-        emissive: 0xc71585,
-        side: THREE.DoubleSide,
-      });
-      const wing = new THREE.Mesh(wingGeometry, wingMaterial);
-      wing.castShadow = true;
-      group.add(wing);
-
-      // Scale pattern spots
-      const spotGeometry = new THREE.CircleGeometry(0.25, 16);
-      const spotColors = [0xFFD700, 0xFF4500, 0x4169E1, 0x32CD32];
-
-      const spotPositions = [
-        [-0.8, 1.2],
-        [0.8, 1.2],
-        [-1.2, 0],
-        [1.2, 0],
-        [-0.6, -1.2],
-        [0.6, -1.2],
-        [0, 1.8],
-        [0, -1.8],
-      ];
-
-      spotPositions.forEach((pos, idx) => {
-        const spotMaterial = new THREE.MeshPhongMaterial({
-          color: spotColors[idx % spotColors.length],
-          emissive: spotColors[idx % spotColors.length],
-          side: THREE.DoubleSide,
-        });
-        const spot = new THREE.Mesh(spotGeometry, spotMaterial);
-        spot.position.set(pos[0], pos[1], 0.02);
-        spot.castShadow = true;
-        group.add(spot);
-      });
-    };
-
-    const createDefaultOrganism = (group: THREE.Group) => {
-      const geometry = new THREE.IcosahedronGeometry(1.5, 5);
-      const material = new THREE.MeshPhongMaterial({
-        color: 0x2d9e6f,
-        emissive: 0x1a5f42,
-      });
-      const mesh = new THREE.Mesh(geometry, material);
-      mesh.castShadow = true;
-      group.add(mesh);
-    };
-
-    const biomimeticModel = createOrganismModel();
-    modelRef.current = biomimeticModel;
-    scene.add(biomimeticModel);
-
-    // Animation loop with smooth rotation
+    // Animation loop with smooth rotation and mouse control
     let animationId: number;
     const animate = () => {
       animationId = requestAnimationFrame(animate);
 
-      // Smooth rotation
       if (modelRef.current) {
         modelRef.current.rotation.x += 0.003;
         modelRef.current.rotation.y += 0.007;
@@ -466,6 +136,428 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
 
     window.addEventListener("resize", handleResize);
 
+    // Helper functions for model creation
+    const createTermiteMound = (group: THREE.Group) => {
+      const spiralCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0, -2.5, 0),
+        new THREE.Vector3(1.8, -1.8, 0.2),
+        new THREE.Vector3(2.3, -0.3, 1.2),
+        new THREE.Vector3(2, 0.8, 1.8),
+        new THREE.Vector3(1, 2, 1.5),
+        new THREE.Vector3(0.2, 2.5, 0.5),
+      ]);
+
+      const tubeGeometry = new THREE.TubeGeometry(spiralCurve, 30, 0.5, 8);
+      const tubeMaterial = new THREE.MeshPhongMaterial({
+        color: 0xA0522D,
+        shininess: 20,
+      });
+      const tube = new THREE.Mesh(tubeGeometry, tubeMaterial);
+      tube.castShadow = true;
+      group.add(tube);
+
+      for (let i = 0; i < 10; i++) {
+        const angle = (i / 10) * Math.PI * 2;
+        const height = Math.sin((i / 10) * Math.PI) * 2.2;
+        const channelGeometry = new THREE.CylinderGeometry(0.25, 0.15, 1.8, 16);
+        const channelMaterial = new THREE.MeshPhongMaterial({
+          color: 0x9B5523,
+          shininess: 15,
+        });
+        const channel = new THREE.Mesh(channelGeometry, channelMaterial);
+        channel.position.set(
+          Math.cos(angle) * 2.5,
+          height - 0.5,
+          Math.sin(angle) * 2.5
+        );
+        channel.rotation.z = angle + Math.PI / 2;
+        channel.castShadow = true;
+        group.add(channel);
+      }
+
+      const moundGeometry = new THREE.SphereGeometry(1.6, 48, 48);
+      const moundMaterial = new THREE.MeshPhongMaterial({
+        color: 0xA0522D,
+        shininess: 10,
+      });
+      const mound = new THREE.Mesh(moundGeometry, moundMaterial);
+      mound.scale.y = 1.35;
+      mound.castShadow = true;
+      group.add(mound);
+    };
+
+    const createGeckoFeet = (group: THREE.Group) => {
+      const padGeometry = new THREE.BoxGeometry(2.2, 1.4, 0.6);
+      const padMaterial = new THREE.MeshPhongMaterial({
+        color: 0xD4A574,
+        shininess: 25,
+      });
+      const pad = new THREE.Mesh(padGeometry, padMaterial);
+      pad.castShadow = true;
+      group.add(pad);
+
+      const bristleGeometry = new THREE.ConeGeometry(0.1, 1.4, 12);
+      const bristleMaterial = new THREE.MeshPhongMaterial({
+        color: 0xA68B5B,
+        shininess: 20,
+      });
+
+      for (let x = -0.95; x <= 0.95; x += 0.25) {
+        for (let z = -0.25; z <= 0.25; z += 0.12) {
+          const bristle = new THREE.Mesh(bristleGeometry, bristleMaterial);
+          bristle.position.set(x, 0.8, z);
+          bristle.castShadow = true;
+          group.add(bristle);
+        }
+      }
+
+      const subBristleGeometry = new THREE.ConeGeometry(0.04, 0.8, 8);
+      const subBristleMaterial = new THREE.MeshPhongMaterial({
+        color: 0x8B7355,
+        shininess: 15,
+      });
+
+      for (let x = -0.7; x <= 0.7; x += 0.7) {
+        for (let z = -0.15; z <= 0.15; z += 0.15) {
+          const subbristle = new THREE.Mesh(subBristleGeometry, subBristleMaterial);
+          subbristle.position.set(x, 1.5, z);
+          subbristle.scale.set(0.6, 0.6, 0.6);
+          subbristle.castShadow = true;
+          group.add(subbristle);
+        }
+      }
+    };
+
+    const createWhaleBlade = (group: THREE.Group) => {
+      const points = [
+        new THREE.Vector2(0, 0),
+        new THREE.Vector2(1.5, 0),
+        new THREE.Vector2(1.8, 0.3),
+        new THREE.Vector2(1.5, 0.6),
+        new THREE.Vector2(0, 0.6),
+      ];
+      const bladeGeometry = new THREE.LatheGeometry(points, 32);
+      const bladeMaterial = new THREE.MeshPhongMaterial({
+        color: 0x4A90E2,
+        shininess: 40,
+      });
+      const blade = new THREE.Mesh(bladeGeometry, bladeMaterial);
+      blade.castShadow = true;
+      group.add(blade);
+
+      const tubercleGeometry = new THREE.IcosahedronGeometry(0.24, 3);
+      const tubercleMaterial = new THREE.MeshPhongMaterial({
+        color: 0x2E5C8A,
+        shininess: 35,
+      });
+
+      for (let i = 0; i < 16; i++) {
+        const x = (i / 15) * 3.4 - 1.7;
+        const tubercle = new THREE.Mesh(tubercleGeometry, tubercleMaterial);
+        tubercle.position.set(x, 0.75, 0.05);
+        tubercle.scale.set(1.1, 0.9, 0.7);
+        tubercle.castShadow = true;
+        group.add(tubercle);
+      }
+    };
+
+    const createLotusLeaf = (group: THREE.Group) => {
+      const leafGeometry = new THREE.PlaneGeometry(3.2, 3.2, 24, 24);
+      const leafPositions = leafGeometry.attributes.position;
+      const positionArray = leafPositions.array as Float32Array;
+
+      for (let i = 0; i < positionArray.length; i += 3) {
+        const x = positionArray[i];
+        const y = positionArray[i + 1];
+        const z = positionArray[i + 2];
+        positionArray[i + 2] =
+          z +
+          Math.sin(x * 2.2) * 0.35 +
+          Math.cos(y * 2.2) * 0.35 +
+          Math.sin(x * 6) * Math.cos(y * 6) * 0.12;
+      }
+      leafPositions.needsUpdate = true;
+      leafGeometry.computeVertexNormals();
+
+      const leafMaterial = new THREE.MeshPhongMaterial({
+        color: 0x2ECC71,
+        shininess: 60,
+      });
+      const leaf = new THREE.Mesh(leafGeometry, leafMaterial);
+      leaf.castShadow = true;
+      group.add(leaf);
+
+      const bumpGeometry = new THREE.SphereGeometry(0.18, 16, 16);
+      const bumpMaterial = new THREE.MeshPhongMaterial({
+        color: 0x27AE60,
+        shininess: 50,
+      });
+
+      for (let x = -1.5; x <= 1.5; x += 0.7) {
+        for (let y = -1.5; y <= 1.5; y += 0.7) {
+          const bump = new THREE.Mesh(bumpGeometry, bumpMaterial);
+          bump.position.set(x, y, 0.55 + Math.random() * 0.25);
+          bump.castShadow = true;
+          group.add(bump);
+        }
+      }
+    };
+
+    const createSpiderWeb = (group: THREE.Group) => {
+      const threadMaterial = new THREE.LineBasicMaterial({
+        color: 0xE8E8E8,
+        linewidth: 3,
+      });
+
+      for (let i = 0; i < 20; i++) {
+        const angle = (i / 20) * Math.PI * 2;
+        const points = [];
+        for (let r = 0; r <= 2.2; r += 0.25) {
+          points.push(
+            new THREE.Vector3(Math.cos(angle) * r, Math.sin(angle) * r, 0)
+          );
+        }
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        const line = new THREE.Line(geometry, threadMaterial);
+        group.add(line);
+      }
+
+      const spiralPoints = [];
+      for (let i = 0; i < 150; i++) {
+        const angle = (i / 150) * Math.PI * 10;
+        const radius = (i / 150) * 2.2;
+        spiralPoints.push(
+          new THREE.Vector3(
+            Math.cos(angle) * radius,
+            Math.sin(angle) * radius,
+            0
+          )
+        );
+      }
+      const spiralGeometry = new THREE.BufferGeometry().setFromPoints(spiralPoints);
+      const spiral = new THREE.Line(spiralGeometry, threadMaterial);
+      group.add(spiral);
+
+      const dropletGeometry = new THREE.SphereGeometry(0.14, 16, 16);
+      const dropletMaterial = new THREE.MeshPhongMaterial({
+        color: 0xB0E0E6,
+        shininess: 80,
+      });
+
+      for (let i = 0; i < 25; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const radius = Math.random() * 2;
+        const droplet = new THREE.Mesh(dropletGeometry, dropletMaterial);
+        droplet.position.set(
+          Math.cos(angle) * radius,
+          Math.sin(angle) * radius,
+          0.25
+        );
+        droplet.castShadow = true;
+        group.add(droplet);
+      }
+    };
+
+    const createAbalonShell = (group: THREE.Group) => {
+      const layers = 7;
+      for (let layer = 0; layer < layers; layer++) {
+        const shellGeometry = new THREE.BoxGeometry(
+          2.6 - layer * 0.25,
+          1.9 - layer * 0.22,
+          0.18
+        );
+        const shellColor = new THREE.Color().setHSL(
+          0.6,
+          0.8,
+          0.5 + (layer / layers) * 0.3
+        );
+        const shellMaterial = new THREE.MeshPhongMaterial({
+          color: shellColor,
+          shininess: 100 + layer * 10,
+        });
+        const shell = new THREE.Mesh(shellGeometry, shellMaterial);
+        shell.position.z = layer * 0.22;
+        shell.rotation.z = (layer * Math.PI) / 18;
+        shell.castShadow = true;
+        group.add(shell);
+      }
+
+      const iridGeometry = new THREE.SphereGeometry(1.3, 40, 40);
+      const iridMaterial = new THREE.MeshPhongMaterial({
+        color: 0x00CED1,
+        shininess: 120,
+      });
+      const iridescence = new THREE.Mesh(iridGeometry, iridMaterial);
+      iridescence.scale.set(1, 0.75, 0.1);
+      iridescence.castShadow = true;
+      group.add(iridescence);
+    };
+
+    const createButterflyWing = (group: THREE.Group) => {
+      const wingGeometry = new THREE.PlaneGeometry(2.8, 3.4);
+      const wingMaterial = new THREE.MeshPhongMaterial({
+        color: 0xFF6B9D,
+        shininess: 50,
+        side: THREE.DoubleSide,
+      });
+      const wing = new THREE.Mesh(wingGeometry, wingMaterial);
+      wing.castShadow = true;
+      group.add(wing);
+
+      const spotGeometry = new THREE.CircleGeometry(0.3, 20);
+      const spotColors = [0xFFD700, 0xFF4500, 0x4169E1, 0x32CD32, 0xFF69B4];
+
+      const spotPositions = [
+        [-0.9, 1.3],
+        [0.9, 1.3],
+        [-1.3, 0.2],
+        [1.3, 0.2],
+        [-0.7, -1.3],
+        [0.7, -1.3],
+        [0, 2.0],
+        [0, -2.0],
+        [-1, 0.8],
+        [1, 0.8],
+      ];
+
+      spotPositions.forEach((pos, idx) => {
+        const spotMaterial = new THREE.MeshPhongMaterial({
+          color: spotColors[idx % spotColors.length],
+          shininess: 40,
+          side: THREE.DoubleSide,
+        });
+        const spot = new THREE.Mesh(spotGeometry, spotMaterial);
+        spot.position.set(pos[0], pos[1], 0.02);
+        spot.castShadow = true;
+        group.add(spot);
+      });
+    };
+
+    const createMothEye = (group: THREE.Group) => {
+      const eyeGeometry = new THREE.SphereGeometry(0.8, 32, 32);
+      const eyeMaterial = new THREE.MeshPhongMaterial({
+        color: 0x1a1a2e,
+        shininess: 30,
+      });
+      const eye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+      eye.castShadow = true;
+      group.add(eye);
+
+      const coneGeometry = new THREE.ConeGeometry(0.08, 0.2, 8);
+      const coneMaterial = new THREE.MeshPhongMaterial({
+        color: 0x2a2a4e,
+        shininess: 20,
+      });
+
+      for (let i = 0; i < 40; i++) {
+        const phi = Math.acos(-1 + (2 * i) / 40);
+        const theta = Math.sqrt(40 * Math.PI) * phi;
+        const x = 0.8 * Math.sin(phi) * Math.cos(theta);
+        const y = 0.8 * Math.sin(phi) * Math.sin(theta);
+        const z = 0.8 * Math.cos(phi);
+
+        const cone = new THREE.Mesh(coneGeometry, coneMaterial);
+        cone.position.set(x, y, z);
+        cone.lookAt(0, 0, 0);
+        cone.castShadow = true;
+        group.add(cone);
+      }
+    };
+
+    const createSharkSkin = (group: THREE.Group) => {
+      const skinGeometry = new THREE.PlaneGeometry(4, 2.5, 40, 25);
+      const skinPositions = skinGeometry.attributes.position;
+      const positionArray = skinPositions.array as Float32Array;
+
+      for (let i = 0; i < positionArray.length; i += 3) {
+        const x = positionArray[i];
+        positionArray[i + 2] = positionArray[i + 2] + Math.sin(x * 10) * 0.1;
+      }
+      skinPositions.needsUpdate = true;
+      skinGeometry.computeVertexNormals();
+
+      const skinMaterial = new THREE.MeshPhongMaterial({
+        color: 0x4A4A4A,
+        shininess: 35,
+      });
+      const skin = new THREE.Mesh(skinGeometry, skinMaterial);
+      skin.castShadow = true;
+      group.add(skin);
+    };
+
+    const createBoneModel = (group: THREE.Group) => {
+      const corticalGeometry = new THREE.CylinderGeometry(0.4, 0.4, 3, 32);
+      const corticalMaterial = new THREE.MeshPhongMaterial({
+        color: 0xDCCCC0,
+        shininess: 30,
+      });
+      const cortical = new THREE.Mesh(corticalGeometry, corticalMaterial);
+      cortical.castShadow = true;
+      group.add(cortical);
+
+      const trabecularGeometry = new THREE.CylinderGeometry(0.35, 0.35, 2.8, 32);
+      const trabecularMaterial = new THREE.MeshPhongMaterial({
+        color: 0xE8D7C7,
+        shininess: 20,
+      });
+      const trabecular = new THREE.Mesh(trabecularGeometry, trabecularMaterial);
+      trabecular.castShadow = true;
+      group.add(trabecular);
+
+      for (let i = 0; i < 8; i++) {
+        const ringGeometry = new THREE.TorusGeometry(0.32 - i * 0.02, 0.05, 16, 100);
+        const ringMaterial = new THREE.LineBasicMaterial({
+          color: 0x8B7D6B,
+          linewidth: 1,
+        });
+        const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+        ring.position.z = -1 + i * 0.35;
+        group.add(ring);
+      }
+    };
+
+    const createHoneycomb = (group: THREE.Group) => {
+      const cellSize = 0.5;
+      const cells = 5;
+
+      for (let layer = 0; layer < 3; layer++) {
+        for (let i = 0; i < cells; i++) {
+          for (let j = 0; j < cells; j++) {
+            const x = i * cellSize - (cellSize * cells) / 2;
+            const y =
+              j * cellSize * Math.sqrt(3) / 2 - (cellSize * cells) / 3;
+            const z = layer * cellSize * 0.5;
+
+            const hexGeometry = new THREE.CylinderGeometry(
+              cellSize * 0.8,
+              cellSize * 0.8,
+              cellSize * 0.6,
+              6
+            );
+            const hexMaterial = new THREE.MeshPhongMaterial({
+              color: 0xFFE680,
+              shininess: 40,
+            });
+            const hex = new THREE.Mesh(hexGeometry, hexMaterial);
+            hex.position.set(x, y, z);
+            hex.castShadow = true;
+            group.add(hex);
+          }
+        }
+      }
+    };
+
+    const createDefaultOrganism = (group: THREE.Group) => {
+      const geometry = new THREE.IcosahedronGeometry(1.5, 5);
+      const material = new THREE.MeshPhongMaterial({
+        color: 0x2d9e6f,
+        shininess: 45,
+      });
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.castShadow = true;
+      group.add(mesh);
+    };
+
     // Cleanup
     return () => {
       window.removeEventListener("resize", handleResize);
@@ -481,9 +573,11 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
   }, [organism, variant]);
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full h-96 bg-gradient-to-b from-slate-100 to-slate-50 rounded-lg border border-border overflow-hidden shadow-lg"
-    />
+    <div className="relative w-full h-96 bg-gradient-to-b from-slate-100 to-slate-50 rounded-lg border border-border overflow-hidden shadow-lg">
+      <div ref={containerRef} className="w-full h-full" />
+      <div className="absolute bottom-2 right-2 text-xs text-muted-foreground bg-white/80 px-2 py-1 rounded">
+        🔄 Rotating | 🎨 High-quality render
+      </div>
+    </div>
   );
 }

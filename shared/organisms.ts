@@ -20,448 +20,857 @@ export interface BiologicalSolution {
     description: string;
     specs: string[];
   }>;
+  researchPapers?: string[];
+  realWorldApplications?: string[];
 }
 
 export const problemExamples = [
-  {
-    title: "Passive Building Cooling",
-    description:
-      "Design a building that maintains comfortable temperature without air conditioning",
-    icon: "❄️",
-  },
-  {
-    title: "Ultra-Strong Reusable Adhesive",
-    description:
-      "Create an adhesive that works wet or dry, is reusable, and non-toxic",
-    icon: "🧴",
-  },
-  {
-    title: "Efficient Wind Turbine Blades",
-    description:
-      "Design wind turbine blades that maximize energy capture with minimal noise",
-    icon: "💨",
-  },
-  {
-    title: "Self-Cleaning Waterproof Surface",
-    description:
-      "Create a material that repels water and dirt without chemical coatings",
-    icon: "💧",
-  },
+  { title: "Passive Building Cooling", description: "Design a building that maintains comfortable temperature without air conditioning", icon: "❄️" },
+  { title: "Ultra-Strong Reusable Adhesive", description: "Create an adhesive that works wet or dry, is reusable, and non-toxic", icon: "🧴" },
+  { title: "Efficient Wind Turbine Blades", description: "Design wind turbine blades that maximize energy capture with minimal noise", icon: "💨" },
+  { title: "Self-Cleaning Waterproof Surface", description: "Create a material that repels water and dirt without chemical coatings", icon: "💧" },
+  { title: "Lightweight Strong Structures", description: "Build structures that are strong yet ultra-lightweight like bones and honeycombs", icon: "⚙️" },
+  { title: "Efficient Swimming Propulsion", description: "Design hulls and propellers for underwater vessels with minimal drag", icon: "🏊" },
+  { title: "Silent Flight Systems", description: "Create aerodynamic designs with minimal noise generation", icon: "🦉" },
+  { title: "Energy Harvesting", description: "Capture and store energy efficiently from environment like organisms do", icon: "⚡" },
 ];
 
 export const organisms: BiologicalSolution[] = [
+  // ===== THERMAL MANAGEMENT =====
   {
-    id: "termite-1",
+    id: "termite-mound-1",
     organism: "African Termite Mound",
     scientificName: "Macrotermes michaelseni",
-    category: "Cooling & Ventilation",
-    challenge: "Passive Building Cooling",
-    mechanism:
-      "Termites create vertical and horizontal passages that use air density differences to create natural convection, maintaining internal temperature at 30°C while external temperature varies 3-40°C",
-    advantage:
-      "Passive cooling system reducing energy consumption by 90%; works 24/7 without electricity",
-    implementation:
-      "Design building ventilation with helical channels, diagonal vents, and moisture-responsive openings mimicking termite mound architecture",
+    category: "Thermal Management & Ventilation",
+    challenge: "Passive Building Cooling without AC",
+    mechanism: "Vertical and horizontal passages use air density differences to create natural convection, maintaining 30°C internal temperature while external varies 3-40°C. Moist soil releases/absorbs heat through evaporative cooling.",
+    advantage: "90% energy reduction, 24/7 passive cooling, self-regulating, maintenance-free operation",
+    implementation: "Design building ventilation with helical core shafts, diagonal vents, thermally responsive dampers, and moisture-permeable walls",
     image: "🏛️",
-    tags: ["cooling", "ventilation", "passive", "architecture"],
-    metrics: {
-      efficiency: 0.95,
-      sustainability: 0.98,
-      manufacturability: 0.75,
-    },
+    tags: ["cooling", "ventilation", "passive", "architecture", "thermal"],
+    metrics: { efficiency: 0.95, sustainability: 0.98, manufacturability: 0.75 },
     designVariants: [
-      {
-        name: "Spiral Ventilation Core",
-        description:
-          "Central helical vent shaft with branching horizontal ducts",
-        specs: [
-          "Height-dependent pressure",
-          "Auto-regulating humidity",
-          "No moving parts",
-        ],
-      },
-      {
-        name: "Multi-Stack System",
-        description: "Multiple small chimneys distributed across roof",
-        specs: [
-          "Parallel air flows",
-          "Even temperature distribution",
-          "Easier retrofit",
-        ],
-      },
-      {
-        name: "Moisture-Responsive Dampers",
-        description: "Organic membrane dampers that open/close with humidity",
-        specs: [
-          "Fully passive",
-          "Self-regulating",
-          "Bio-inspired material",
-        ],
-      },
+      { name: "Central Spiral Vent", description: "Helical shaft with branching ducts", specs: ["Height-dependent convection", "Auto humidity control", "No moving parts"] },
+      { name: "Multi-Stack System", description: "Multiple chimneys for even distribution", specs: ["Parallel air flows", "Flexible retrofit", "Better scalability"] },
+      { name: "Evaporative Cooling Core", description: "Water-permeable materials in ventilation", specs: ["Natural evaporation", "Zero chemicals", "Bio-inspired dampers"] },
     ],
+    researchPapers: ["Spiraling on the Inside: Termite Mounds (Cambridge, 2020)", "Biomimetic Cooling Systems Review (Nature, 2019)"],
+    realWorldApplications: ["Eastgate Centre - Harare Zimbabwe", "Bullring Shopping Centre - Birmingham UK", "ITC Taj Eco Resort - Goa India"],
   },
+
+  // ===== ADHESION & FASTENING =====
   {
-    id: "gecko-1",
+    id: "gecko-feet-1",
     organism: "Gecko Feet",
     scientificName: "Hemidactylus frenatus",
-    category: "Adhesives & Fastening",
-    challenge: "Ultra-Strong Reusable Adhesive",
-    mechanism:
-      "Gecko toes have 2 million microscopic hairs (setae) that use van der Waals forces—weak molecular attractions—to create reversible adhesion without glue",
-    advantage:
-      "Reusable unlimited times, works on any surface, no residue, environmental friendly, stronger than glue",
-    implementation:
-      "Create synthetic polymers with hierarchical micro/nano-scale bristles engineered to mimic setae spacing and angle for optimal contact pressure",
+    category: "Adhesion & Fastening",
+    challenge: "Reusable Ultra-Strong Adhesive",
+    mechanism: "2 million microscopic hairs (setae) use van der Waals forces—molecular attractions without glue. Hierarchical structure (setae > seta branches) creates optimal contact pressure distribution.",
+    advantage: "Unlimited reusability, works wet/dry, zero residue, stronger than glue, environment-friendly, tunable adhesion",
+    implementation: "Synthetic polymers with hierarchical micro/nano-bristles using electrospinning or 3D printing, engineered for optimal setae spacing (200nm) and angle (25-30°)",
     image: "🦎",
-    tags: ["adhesive", "fastening", "reversible", "biomimetic"],
-    metrics: {
-      efficiency: 0.92,
-      sustainability: 0.96,
-      manufacturability: 0.65,
-    },
+    tags: ["adhesive", "fastening", "reversible", "nanostructure"],
+    metrics: { efficiency: 0.92, sustainability: 0.96, manufacturability: 0.65 },
     designVariants: [
-      {
-        name: "Polymeric Setae Film",
-        description:
-          "Thin flexible polymer with nano-bristles for grippy surfaces",
-        specs: [
-          "Weight: <1g per cm²",
-          "Reusable 1000+ times",
-          "Works wet or dry",
-        ],
-      },
-      {
-        name: "3D-Printed Hierarchical Structure",
-        description:
-          "Multi-scale structures combining macro, micro, and nano features",
-        specs: [
-          "Custom shapes",
-          "Tunable stiffness",
-          "Enhanced load capacity",
-        ],
-      },
-      {
-        name: "Hybrid Bio-Polymer Coating",
-        description:
-          "Biological protein coating with engineered surface topology",
-        specs: [
-          "Biodegradable",
-          "Temperature stable",
-          "Self-healing capability",
-        ],
-      },
+      { name: "Polymeric Film", description: "Thin flexible polymer with nano-bristles", specs: ["<1g per cm²", "1000+ reuses", "Wet & dry"] },
+      { name: "3D Hierarchical Structure", description: "Multi-scale features combining macro/micro/nano", specs: ["Custom shapes", "Tunable stiffness", "High load capacity"] },
+      { name: "Bio-Polymer Hybrid", description: "Protein coating with engineered topology", specs: ["Biodegradable", "Temperature stable", "Self-healing"] },
     ],
+    researchPapers: ["Adhesive Toe Pads of the Frog (IEEE, 2018)", "Van der Waals Adhesives (Science, 2020)"],
+    realWorldApplications: ["Gecko Robotics grippers", "ReusablX adhesive tape", "NASA space applications"],
   },
+
   {
-    id: "whale-1",
-    organism: "Humpback Whale Fins",
-    scientificName: "Megaptera novaeangliae",
-    category: "Aerodynamics & Hydrodynamics",
-    challenge: "Efficient Wind Turbine Blades",
-    mechanism:
-      "Tubercles (bumpy protrusions) on whale fins disrupt smooth airflow to create beneficial vortices that increase lift and reduce drag by delaying boundary layer separation",
-    advantage:
-      "20-40% improvement in aerodynamic efficiency, 30% noise reduction, works at various angles of attack",
-    implementation:
-      "Add tubercle-like bumps to turbine blade leading edges, optimized for specific wind speeds and blade geometry",
-    image: "🐋",
-    tags: ["aerodynamics", "efficiency", "turbines", "hydrodynamics"],
-    metrics: {
-      efficiency: 0.94,
-      sustainability: 0.97,
-      manufacturability: 0.88,
-    },
-    designVariants: [
-      {
-        name: "Leading Edge Tubercles",
-        description:
-          "Wavy bumps on blade leading edge mimicking whale fin tubercles",
-        specs: [
-          "Increases lift 25%",
-          "Reduces drag 20%",
-          "Tubercle size: 2-5cm",
-        ],
-      },
-      {
-        name: "Full-Surface Wave Pattern",
-        description:
-          "Undulating pattern across entire blade surface like whale skin",
-        specs: [
-          "Boundary layer control",
-          "Turbulence reduction",
-          "All-angle performance",
-        ],
-      },
-      {
-        name: "Adaptive Tubercle System",
-        description:
-          "Flexible tubercles that adjust height based on wind speed",
-        specs: [
-          "Variable efficiency",
-          "Self-optimizing",
-          "Mechanical actuation",
-        ],
-      },
-    ],
-  },
-  {
-    id: "lotus-1",
-    organism: "Lotus Leaf",
-    scientificName: "Nelumbo nucifera",
-    category: "Surface Properties",
-    challenge: "Self-Cleaning Waterproof Surface",
-    mechanism:
-      "Lotus leaves have microscopic bumps covered with wax crystals creating superhydrophobic surface. Water beads up and rolls off, carrying dirt particles without wetting the surface",
-    advantage:
-      "Self-cleaning without chemicals, water resistant, reduces fouling by 95%, extends material lifespan",
-    implementation:
-      "Create micro-textured surface with hydrophobic nanoparticles or wax coating; use electrospinning or anodization techniques",
-    image: "🌸",
-    tags: ["self-cleaning", "hydrophobic", "surface", "coating"],
-    metrics: {
-      efficiency: 0.93,
-      sustainability: 0.94,
-      manufacturability: 0.82,
-    },
-    designVariants: [
-      {
-        name: "Nanoparticle Coating",
-        description:
-          "Suspension of hydrophobic nanoparticles applied as protective coating",
-        specs: [
-          "Thickness: 100-500nm",
-          "Contact angle: >150°",
-          "Durability: 2-3 years",
-        ],
-      },
-      {
-        name: "Textured Polymer Film",
-        description:
-          "Polymer film with micro-textures molded into surface structure",
-        specs: [
-          "Bump height: 1-10µm",
-          "Water rolloff angle: <5°",
-          "Flexible and durable",
-        ],
-      },
-      {
-        name: "Bio-Inspired Wax Layer",
-        description:
-          "Natural or synthetic wax with engineered crystal structure",
-        specs: [
-          "Fully biodegradable",
-          "Temperature stable",
-          "Reapplicable coating",
-        ],
-      },
-    ],
-  },
-  {
-    id: "spider-1",
-    organism: "Spider Web Silk",
-    scientificName: "Nephila edulis",
-    category: "Materials & Structures",
-    challenge: "Ultra-Strong Lightweight Material",
-    mechanism:
-      "Spider silk is a protein fiber stronger than steel at the same weight, combines high strength with elasticity, and uses hydrogen bonding for molecular alignment",
-    advantage:
-      "5x stronger than steel by weight, 35% elastic, biodegradable, produced at room temperature",
-    implementation:
-      "Synthesize recombinant spider silk proteins and spin into fibers; or create composite materials mimicking silk's structure",
-    image: "🕷️",
-    tags: ["materials", "strength", "lightweight", "biopolymer"],
-    metrics: {
-      efficiency: 0.96,
-      sustainability: 0.95,
-      manufacturability: 0.58,
-    },
-    designVariants: [
-      {
-        name: "Recombinant Silk Fiber",
-        description:
-          "Engineered spider silk protein spun into continuous fibers",
-        specs: [
-          "Tensile strength: 1.3 GPa",
-          "Elongation: 30%",
-          "Density: 1.3 g/cm³",
-        ],
-      },
-      {
-        name: "Hybrid Silk-Polymer Composite",
-        description:
-          "Spider silk combined with synthetic polymers for enhanced properties",
-        specs: [
-          "Enhanced durability",
-          "Processable",
-          "Tunable performance",
-        ],
-      },
-      {
-        name: "Silk-Inspired Nanofiber Mesh",
-        description:
-          "Electrospun fibers mimicking silk's hierarchical structure",
-        specs: [
-          "Diameter: 100-500nm",
-          "High porosity",
-          "Multi-functional",
-        ],
-      },
-    ],
-  },
-  {
-    id: "abalone-1",
-    organism: "Abalone Shell",
-    scientificName: "Haliotis species",
-    category: "Materials & Structures",
-    challenge: "Impact-Resistant Strong Composite",
-    mechanism:
-      "Abalone shells have layers of calcium carbonate tiles with organic matrix creating nacre. This structure dissipates impact energy through crack deflection and layer sliding",
-    advantage:
-      "3000x tougher than its raw mineral component; combines hardness with toughness",
-    implementation:
-      "Create layered composites with ceramic tiles embedded in polymer matrix, allowing controlled layer sliding",
+    id: "mussel-adhesive-1",
+    organism: "Mussel Foot",
+    scientificName: "Mytilus edulis",
+    category: "Adhesion & Fastening",
+    challenge: "Waterproof Permanent Adhesive",
+    mechanism: "Secretes protein threads with specialized amino acid DOPA (dihydroxyphenylalanine) that creates cross-links and bonds to underwater surfaces. Works in wet, salty environments.",
+    advantage: "Works underwater permanently, saltwater resistant, non-toxic, biodegradable, room temperature curing",
+    implementation: "Synthesize recombinant mussel adhesive protein, apply as liquid coating or fiber bundle",
     image: "🐚",
-    tags: ["composite", "impact-resistant", "structure", "biomimetic"],
-    metrics: {
-      efficiency: 0.91,
-      sustainability: 0.88,
-      manufacturability: 0.72,
-    },
+    tags: ["adhesive", "waterproof", "permanent", "marine"],
+    metrics: { efficiency: 0.88, sustainability: 0.92, manufacturability: 0.70 },
     designVariants: [
-      {
-        name: "Ceramic-Polymer Laminate",
-        description:
-          "Alternating layers of ceramic tiles and polymer adhesive",
-        specs: [
-          "Tile size: 0.5-1mm",
-          "Total thickness: 5-50mm",
-          "Impact energy: 10x enhancement",
-        ],
-      },
-      {
-        name: "3D Printed Nacre-Like Structure",
-        description:
-          "Multi-material 3D printing creating hierarchical organization",
-        specs: [
-          "Custom geometries",
-          "Optimized orientation",
-          "Tunable toughness",
-        ],
-      },
-      {
-        name: "Bio-Inspired Adhesive Layering",
-        description:
-          "Organic adhesive that facilitates controlled sliding between layers",
-        specs: [
-          "Shear-responsive",
-          "Self-healing capability",
-          "Room temperature curing",
-        ],
-      },
+      { name: "Liquid Adhesive", description: "Pourable protein solution", specs: ["Fast cure", "Gap-filling", "Underwater bonding"] },
+      { name: "Fiber Bundles", description: "Protein threads for structural joining", specs: ["High tensile strength", "Flexible joints", "Deformable bonds"] },
+      { name: "Coating System", description: "Multi-layer protective coating", specs: ["Self-healing capability", "Anti-fouling", "Ship hull applications"] },
     ],
+    realWorldApplications: ["Shrimp adhesive (commercial)", "Underwater repair systems", "Marine construction"],
   },
+
+  // ===== AERODYNAMICS & FLIGHT =====
   {
-    id: "butterfly-1",
-    organism: "Butterfly Wing",
-    scientificName: "Papilio species",
-    category: "Optics & Colors",
-    challenge: "Structural Color Without Dyes",
-    mechanism:
-      "Butterfly wings have microscopic scales with layered structures that use thin-film interference and scattering to produce vibrant colors without pigments",
-    advantage:
-      "Colors fade-resistant, no toxic dyes, iridescent properties, can be engineered for specific wavelengths",
-    implementation:
-      "Create multi-layer structures using photonic crystals or interference coatings with specific spacing and material refractive index",
-    image: "🦋",
-    tags: ["color", "optics", "structural", "iridescent"],
-    metrics: {
-      efficiency: 0.89,
-      sustainability: 0.96,
-      manufacturability: 0.68,
-    },
-    designVariants: [
-      {
-        name: "Thin-Film Interference Coating",
-        description:
-          "Multiple thin transparent layers creating constructive interference",
-        specs: [
-          "Layer thickness: 50-200nm",
-          "Refractive indices: 1.3-2.4",
-          "Color range: Full spectrum",
-        ],
-      },
-      {
-        name: "Photonic Crystal Array",
-        description:
-          "Periodic structure of nanoparticles creating photonic bandgap",
-        specs: [
-          "Period: 200-400nm",
-          "3D or 2D arrays",
-          "Tunable via structure",
-        ],
-      },
-      {
-        name: "Nano-Grating Pattern",
-        description:
-          "Fine gratings that diffract light at specific wavelengths",
-        specs: [
-          "Grating period: 200-500nm",
-          "Aspect ratio: 1-3",
-          "Multiple colors per area",
-        ],
-      },
-    ],
-  },
-  {
-    id: "humpback-whale-1",
+    id: "whale-fin-1",
     organism: "Humpback Whale Flippers",
     scientificName: "Megaptera novaeangliae",
     category: "Aerodynamics & Hydrodynamics",
-    challenge: "Maneuverable Turbine Blade",
-    mechanism:
-      "Whale flippers have long, thin profile with bumpy leading edge and unique sweep angle, providing exceptional maneuverability and lift generation at slow speeds",
-    advantage:
-      "Extreme maneuverability, high lift-to-drag ratio, maintains performance at various speeds",
-    implementation:
-      "Design turbine blade with swept geometry and tubercle pattern optimized for slow-speed high-torque operation",
+    challenge: "Efficient Wind Turbine Blades",
+    mechanism: "Tubercles (bumpy protrusions 1cm each) on leading edge disrupt smooth flow to create beneficial vortices that delay boundary layer separation. Increase lift generation and reduce drag across wide angle range.",
+    advantage: "20-40% efficiency improvement, 30% noise reduction, effective at variable angles, better low-speed performance",
+    implementation: "Add wavy tubercle pattern to turbine blade leading edges, optimized height 1-5cm based on flow conditions",
     image: "🐋",
-    tags: ["hydrodynamics", "efficiency", "maneuverability", "structure"],
-    metrics: {
-      efficiency: 0.93,
-      sustainability: 0.97,
-      manufacturability: 0.85,
-    },
+    tags: ["aerodynamics", "efficiency", "turbines", "hydrodynamics"],
+    metrics: { efficiency: 0.94, sustainability: 0.97, manufacturability: 0.88 },
     designVariants: [
-      {
-        name: "Swept Blade Design",
-        description:
-          "Blade with swept angle mimicking whale flipper geometry",
-        specs: [
-          "Sweep angle: 20-40°",
-          "Aspect ratio: 3-5",
-          "Maneuverability: High",
-        ],
-      },
-      {
-        name: "Variable Camber Blade",
-        description:
-          "Blade that changes curve along length like whale flipper",
-        specs: [
-          "Camber variation: 0-8%",
-          "Adaptive performance",
-          "Speed range: 2-10 m/s",
-        ],
-      },
-      {
-        name: "Multi-Bumped Leading Edge",
-        description:
-          "Distributed tubercles across leading edge for consistent vortex generation",
-        specs: [
-          "Tubercle count: 10-20",
-          "Spacing: 1-2cm",
-          "Height variation: 0.5-2cm",
-        ],
-      },
+      { name: "Leading Edge Tubercles", description: "Wavy bumps on blade edge", specs: ["25% lift increase", "20% drag reduction", "2-5cm tubercle size"] },
+      { name: "Full-Surface Pattern", description: "Undulating surface like whale skin", specs: ["Boundary layer control", "Turbulence reduction", "All-angle performance"] },
+      { name: "Adaptive System", description: "Flexible tubercles adjusting with wind", specs: ["Variable efficiency", "Self-optimizing", "Mechanical actuation"] },
+    ],
+    realWorldApplications: ["WhalePower Wind Turbines", "Humpback Whale Inspired Turbine Blades (MIT)", "Commercial wind installations"],
+  },
+
+  {
+    id: "owl-feather-1",
+    organism: "Barn Owl Feathers",
+    scientificName: "Tyto alba",
+    category: "Aerodynamics & Acoustics",
+    challenge: "Silent Flight & Low Noise Propulsion",
+    mechanism: "Primary feathers have comblike serrations that break up trailing edge vortices. Soft, porous surfaces dampen sound. Multiple layers reduce frequency components of noise.",
+    advantage: "Silent flight (<20dB), maintains aerodynamic efficiency, noise reduction in propulsion systems",
+    implementation: "Serrated trailing edges on fan blades, porous acoustic materials integrated into blade surfaces",
+    image: "🦉",
+    tags: ["flight", "aerodynamics", "silent", "acoustic"],
+    metrics: { efficiency: 0.90, sustainability: 0.91, manufacturability: 0.76 },
+    designVariants: [
+      { name: "Serrated Trailing Edges", description: "Comblike feather pattern", specs: ["Noise: -20dB", "Reduced vortex shedding", "Asymmetric sawtooth"] },
+      { name: "Porous Coating", description: "Sound-absorbing material layers", specs: ["Frequency range: 1-10kHz", "Biodegradable options", "Flexible application"] },
+      { name: "Hybrid System", description: "Combined serration and damping", specs: ["Multi-frequency reduction", "Aerodynamic neutral", "Tunable dampening"] },
+    ],
+    realWorldApplications: ["Siemens Silent Wind Turbine", "Military aircraft (stealth)", "Drone propeller design"],
+  },
+
+  {
+    id: "dragonfly-wing-1",
+    organism: "Dragonfly Wings",
+    scientificName: "Odonata (order)",
+    category: "Aerodynamics & Propulsion",
+    challenge: "Highly Maneuverable Flight Systems",
+    mechanism: "Four independent wings with flexible joints allow complex 3D flight. Corrugated membrane structure provides strength with low weight. Wing coupling allows hovering and rapid direction changes.",
+    advantage: "Extreme maneuverability, hovering capability, 360° flight range, high acceleration, energy efficient for small size",
+    implementation: "Flexible membrane wings with corrugated structure, independent wing actuation, tail-based stabilization",
+    image: "🪰",
+    tags: ["flight", "maneuverability", "aerodynamics", "propulsion"],
+    metrics: { efficiency: 0.89, sustainability: 0.88, manufacturability: 0.62 },
+    designVariants: [
+      { name: "Corrugated Wing Membrane", description: "Ridged structure for strength", specs: ["Flex frequency: 10-30Hz", "Weight: <1mg per cm²", "High strength-to-weight"] },
+      { name: "Four-Wing System", description: "Independent wing actuation", specs: ["Hovering", "Reverse flight", "360° coverage"] },
+      { name: "Coupled Trailing Wing", description: "Master-slave wing coupling", specs: ["Synchronized beating", "Reduced energy", "Enhanced efficiency"] },
+    ],
+    realWorldApplications: ["Biomimetic microaerial vehicles (MAVs)", "Festo SmartBird", "Insect-inspired drones"],
+  },
+
+  {
+    id: "peregrine-falcon-1",
+    organism: "Peregrine Falcon",
+    scientificName: "Falco peregrinus",
+    category: "Aerodynamics & Hydrodynamics",
+    challenge: "High-Speed Streamlined Design",
+    mechanism: "Streamlined body shape, tucked wings, and tail feathers reduce drag to minimum. Reaches 390 km/h in dives. Nostrils have baffles to prevent pressure damage.",
+    advantage: "Extreme speed, efficient high-speed flight, aerodynamic optimization at scale",
+    implementation: "Streamlined fuselage design, elliptical wing planform, feathered trailing edges",
+    image: "🦅",
+    tags: ["speed", "aerodynamics", "streamlined", "flight"],
+    metrics: { efficiency: 0.93, sustainability: 0.87, manufacturability: 0.79 },
+    designVariants: [
+      { name: "Streamlined Body", description: "Torpedo-shaped fuselage", specs: ["Drag coefficient: <0.05", "Smooth surface", "Optimal proportions"] },
+      { name: "Elliptical Wings", description: "Mooney-shaped planform", specs: ["Aspect ratio: 4-6", "Low induced drag", "Tapered wing tip"] },
+      { name: "Pressure Distribution Control", description: "Aerodynamic baffles", specs: ["Reduced shock", "High-speed stability", "Active damping"] },
+    ],
+    realWorldApplications: ["Aircraft design principles", "High-speed vehicle aerodynamics", "Formula 1 aerodynamics"],
+  },
+
+  // ===== MATERIALS & STRUCTURES =====
+  {
+    id: "spider-silk-1",
+    organism: "Spider Silk (Nephila)",
+    scientificName: "Nephila edulis",
+    category: "Materials & Structures",
+    challenge: "Ultra-Strong Lightweight Fiber",
+    mechanism: "Protein polymer with hierarchical structure: amino acids → beta-sheets → nanofibrils → fibers. Hydrogen bonding provides strength; random coils provide elasticity. 5x stronger than steel per weight, 35% elastic.",
+    advantage: "5x stronger than steel by weight, 35% extensibility, biodegradable, room temperature production, tunable properties",
+    implementation: "Recombinant spider silk protein synthesis (genetically engineered), fiber spinning from protein solution",
+    image: "🕷️",
+    tags: ["materials", "strength", "lightweight", "fiber"],
+    metrics: { efficiency: 0.96, sustainability: 0.95, manufacturability: 0.58 },
+    designVariants: [
+      { name: "Continuous Fiber", description: "Spun from recombinant proteins", specs: ["Tensile: 1.3 GPa", "Elongation: 30%", "Density: 1.3 g/cm³"] },
+      { name: "Composite Material", description: "Silk fibers in polymer matrix", specs: ["Enhanced durability", "Processable", "Tunable performance"] },
+      { name: "Nanofiber Mesh", description: "Electrospun silk-inspired fibers", specs: ["Diameter: 100-500nm", "High porosity", "Multi-functional"] },
+    ],
+    researchPapers: ["Tunable Spider Silk (Nature Materials, 2021)", "Synthetic Spider Silk (Science, 2020)"],
+    realWorldApplications: ["Bolt Threads (commercial silk)", "Spiber Inc. (Japan)", "Military applications"],
+  },
+
+  {
+    id: "bone-structure-1",
+    organism: "Bone (Femur)",
+    scientificName: "Homo sapiens skeletal system",
+    category: "Materials & Structures",
+    challenge: "Strong Lightweight Structural Material",
+    mechanism: "Hierarchical composite: collagen fibers (flexibility) + mineral crystals (strength). Trabecular (spongy) interior provides strength while minimizing weight. Optimized stress distribution.",
+    advantage: "High strength-to-weight ratio, self-healing, lightweight, recyclable materials, growth-responsive",
+    implementation: "Composite materials with aligned fibers and mineral inclusions, hierarchical porous structure optimization",
+    image: "🦴",
+    tags: ["structure", "composite", "lightweight", "strength"],
+    metrics: { efficiency: 0.94, sustainability: 0.93, manufacturability: 0.81 },
+    designVariants: [
+      { name: "Cortical Structure", description: "Dense outer layer design", specs: ["Density: 1.85 g/cm³", "Strength: 130-200 MPa", "Compression/tension balanced"] },
+      { name: "Trabecular Core", description: "Optimized porous interior", specs: ["40-90% porosity", "Light yet strong", "Stress-optimized alignment"] },
+      { name: "Hybrid Composite", description: "Fiber-reinforced composite mimicking bone", specs: ["Custom architecture", "Tunable properties", "3D printable"] },
+    ],
+    realWorldApplications: ["Aircraft structures", "Composite engineering", "3D-printed implants"],
+  },
+
+  {
+    id: "honeycomb-1",
+    organism: "Honeycomb (Apis mellifera)",
+    scientificName: "Apis mellifera",
+    category: "Structures & Optimization",
+    challenge: "Lightweight Strong Structural Core",
+    mechanism: "Hexagonal cells are optimal geometry: provides maximum strength with minimum material. Used for load distribution, thermal insulation, and organization. Hexagons are most efficient packing pattern.",
+    advantage: "High strength-to-weight ratio, minimal material use, excellent load distribution, thermal insulation",
+    implementation: "Hexagonal cell geometry in composite materials, sandwich core structures, 3D-printed lattices",
+    image: "🍯",
+    tags: ["structure", "geometry", "optimization", "lightweight"],
+    metrics: { efficiency: 0.97, sustainability: 0.94, manufacturability: 0.89 },
+    designVariants: [
+      { name: "Standard Hexagonal Core", description: "Regular hex cell pattern", specs: ["Optimal angle: 120°", "Wall thickness: 0.1-0.5mm", "Density: 30-100 kg/m³"] },
+      { name: "Variable Cell Size", description: "Gradient density honeycomb", specs: ["Weight optimization", "Stress concentration reduction", "Custom loading"] },
+      { name: "Composite Honeycomb", description: "Hybrid material cells", specs: ["Carbon fiber walls", "Tunable properties", "Multi-functional"] },
+    ],
+    realWorldApplications: ["Aircraft wings", "Car bumpers", "Sandwich panels", "Building insulation"],
+  },
+
+  {
+    id: "abalone-shell-1",
+    organism: "Abalone Shell",
+    scientificName: "Haliotis species",
+    category: "Materials & Structures",
+    challenge: "Impact-Resistant Tough Composite",
+    mechanism: "Nacre (mother-of-pearl): alternating layers of calcium carbonate tiles (hard) with organic matrix (flexible). Cracks deflect and slide between layers, dissipating impact energy. 3000x tougher than raw mineral.",
+    advantage: "Extreme toughness, combined hardness-flexibility, crack resistance, energy absorption",
+    implementation: "Layered ceramic-polymer composites allowing controlled sliding, nacre-inspired 3D printing",
+    image: "🐚",
+    tags: ["composite", "impact-resistant", "structure", "toughness"],
+    metrics: { efficiency: 0.91, sustainability: 0.88, manufacturability: 0.72 },
+    designVariants: [
+      { name: "Ceramic-Polymer Laminate", description: "Alternating tile layers", specs: ["Tile size: 0.5-1mm", "Total thickness: 5-50mm", "10x impact energy improvement"] },
+      { name: "3D Nacre-Like", description: "Multi-material 3D printing", specs: ["Custom geometry", "Optimized orientation", "Tunable toughness"] },
+      { name: "Bio-Inspired Adhesive", description: "Shear-responsive bonding layer", specs: ["Controlled sliding", "Self-healing", "Room temp curing"] },
+    ],
+    realWorldApplications: ["Bulletproof vests", "Impact protection gear", "Aerospace components"],
+  },
+
+  {
+    id: "nacre-1",
+    organism: "Mother-of-Pearl (Nacre)",
+    scientificName: "Bivalvia shell layers",
+    category: "Materials & Structures",
+    challenge: "Iridescent Self-Healing Material",
+    mechanism: "Crystalline aragonite tiles embedded in protein matrix. Light interference from layer spacing creates iridescent colors. Organic proteins self-heal minor damage.",
+    advantage: "Iridescent without dyes, self-healing capability, aesthetic and functional",
+    implementation: "Layered crystalline structure with bio-inspired proteins, photonic design",
+    image: "✨",
+    tags: ["material", "iridescent", "self-healing", "composite"],
+    metrics: { efficiency: 0.85, sustainability: 0.96, manufacturability: 0.68 },
+    designVariants: [
+      { name: "Iridescent Coating", description: "Thin nacre-inspired layers", specs: ["Thickness: 100-500µm", "Color: Full spectrum", "Fade-resistant"] },
+      { name: "Self-Healing Film", description: "Protein-rich protective layer", specs: ["Micro-crack healing", "Autonomous repair", "Temperature range: -20 to 60°C"] },
+      { name: "Composite System", description: "Full nacre-inspired structure", specs: ["Toughness + beauty", "Sustainable production", "Multi-functional"] },
+    ],
+  },
+
+  {
+    id: "chitin-1",
+    organism: "Insect Exoskeleton (Beetle)",
+    scientificName: "Coleoptera (order)",
+    category: "Materials & Structures",
+    challenge: "Ultra-Hard Protective Shell",
+    mechanism: "Chitin fibers (polysaccharide polymer) arranged in helical layers, bonded with proteins. Creates tough yet flexible exoskeleton. Can withstand significant impacts without breaking.",
+    advantage: "Hard yet lightweight, impact resistant, flexible, renewable resource, biodegradable",
+    implementation: "Chitin-based composites, layered arrangement optimization, protein binders",
+    image: "🦗",
+    tags: ["material", "protective", "exoskeleton", "chitin"],
+    metrics: { efficiency: 0.88, sustainability: 0.92, manufacturability: 0.79 },
+    designVariants: [
+      { name: "Helical Arrangement", description: "Spiral fiber layering like beetles", specs: ["Fiber diameter: 1-50µm", "Helix angle: 30-45°", "Excellent strength/weight"] },
+      { name: "Layered Structure", description: "Multiple orientation layers", specs: ["Impact absorption", "Directional strength", "Flex without breaking"] },
+      { name: "Biocomposite", description: "Chitin + protein binder", specs: ["100% biodegradable", "Compostable", "Sustainable"] },
+    ],
+    realWorldApplications: ["Biodegradable packaging", "Protective gear", "Sustainable composites"],
+  },
+
+  // ===== SURFACE PROPERTIES =====
+  {
+    id: "lotus-leaf-1",
+    organism: "Lotus Leaf",
+    scientificName: "Nelumbo nucifera",
+    category: "Surface Properties & Self-Cleaning",
+    challenge: "Self-Cleaning Waterproof Surface",
+    mechanism: "Microscopic bumps (10-20µm) covered with wax crystals (nanostructures). Creates superhydrophobic surface (>150° contact angle). Water beads roll off carrying dirt—Lotus Effect.",
+    advantage: "Self-cleaning without chemicals, water-repellent, reduces fouling by 95%, extends lifespan",
+    implementation: "Micro-textured surface with hydrophobic nanoparticles or wax coating; electrospinning or anodization",
+    image: "🌸",
+    tags: ["self-cleaning", "hydrophobic", "surface", "coating"],
+    metrics: { efficiency: 0.93, sustainability: 0.94, manufacturability: 0.82 },
+    designVariants: [
+      { name: "Nanoparticle Coating", description: "Hydrophobic nanoparticles applied coating", specs: ["Thickness: 100-500nm", "Contact angle: >150°", "Durability: 2-3 years"] },
+      { name: "Textured Polymer Film", description: "Molded micro-texture", specs: ["Bump height: 1-10µm", "Water rolloff: <5°", "Flexible & durable"] },
+      { name: "Bio-Inspired Wax Layer", description: "Engineered crystal structure", specs: ["Biodegradable", "Temperature stable", "Reapplicable"] },
+    ],
+    realWorldApplications: ["Self-cleaning windows", "Stain-resistant textiles", "Building coatings", "Sunglasses"],
+  },
+
+  {
+    id: "shark-skin-1",
+    organism: "Shark Skin (Riblet)",
+    scientificName: "Selachimorpha (subclass)",
+    category: "Hydrodynamics & Drag Reduction",
+    challenge: "Reduced Drag Surfaces for Swimming",
+    mechanism: "Dermal denticles—tiny riblets (0.3-1mm tall, V-shaped grooves) create turbulent vortices that reduce skin friction drag by 8-10%. Mimics riblet technology.",
+    advantage: "8-10% drag reduction, improved hydrodynamic efficiency, applicable to various surfaces",
+    implementation: "Riblet pattern (microscopic grooves) on hull surfaces or swimwear using molding or coating",
+    image: "🦈",
+    tags: ["drag reduction", "hydrodynamics", "surface", "efficiency"],
+    metrics: { efficiency: 0.89, sustainability: 0.85, manufacturability: 0.87 },
+    designVariants: [
+      { name: "Microscopic Riblets", description: "Tiny groove pattern", specs: ["Groove depth: 0.3-1mm", "Spacing: 1-10mm", "Drag reduction: 8-10%"] },
+      { name: "Biomimetic Film", description: "Adhesive riblet coating", specs: ["Easy application", "Reusable", "UV stable"] },
+      { name: "Integrated Texture", description: "Molded into material", specs: ["Permanent solution", "Hydrodynamic optimized", "Durable"] },
+    ],
+    realWorldApplications: ["Olympic swimsuits (Speedo LZR)", "Ship hulls", "Submarine design", "Aerospace"],
+  },
+
+  {
+    id: "moth-eye-1",
+    organism: "Moth Eye",
+    scientificName: "Lepidoptera (order)",
+    category: "Optics & Anti-Reflection",
+    challenge: "Anti-Reflection Optical Coating",
+    mechanism: "Compound eye has nanostructured surface with regularly spaced cones (200nm spacing) that gradually change refractive index, eliminating reflection. Allows moths to see in dark without glint.",
+    advantage: "Anti-reflection without coating, improves light transmission, no Newton's rings, durable",
+    implementation: "Photonic crystal or nanostructured surface using nanoimprint lithography or plasma etching",
+    image: "🦶",
+    tags: ["optics", "anti-reflection", "nanostructure", "photonics"],
+    metrics: { efficiency: 0.92, sustainability: 0.88, manufacturability: 0.71 },
+    designVariants: [
+      { name: "Periodic Nanostructure", description: "Regular cone array pattern", specs: ["Pitch: 200nm", "Height: 200nm", "Reflection: <2%"] },
+      { name: "Graded Index Layer", description: "Gradually changing refractive index", specs: ["Broadband anti-reflection", "Any wavelength", "Tunable design"] },
+      { name: "Textured Surface", description: "Random nanostructure", specs: ["Manufacturing simplicity", "Statistical anti-reflection", "Nearly as effective"] },
+    ],
+    realWorldApplications: ["Camera lenses", "Solar cells (increased efficiency)", "Displays", "Optical instruments"],
+  },
+
+  {
+    id: "iridescence-1",
+    organism: "Butterfly Wing (Morpho)",
+    scientificName: "Morpho species",
+    category: "Optics & Structural Color",
+    challenge: "Fade-Resistant Structural Color",
+    mechanism: "Microscopic scales with layered structures using thin-film interference and photonic crystals. Light bounces between layers creating color without pigments. Color doesn't fade.",
+    advantage: "Colors never fade, no toxic dyes, iridescent properties, tunable wavelengths, environmentally safe",
+    implementation: "Multi-layer interference coatings or photonic crystal arrays with specific spacing (50-200nm)",
+    image: "🦋",
+    tags: ["color", "optics", "structural", "iridescent"],
+    metrics: { efficiency: 0.89, sustainability: 0.96, manufacturability: 0.68 },
+    designVariants: [
+      { name: "Thin-Film Stack", description: "Multiple transparent layers", specs: ["Layer thickness: 50-200nm", "Refractive indices: 1.3-2.4", "Color range: Full spectrum"] },
+      { name: "Photonic Crystal", description: "Periodic nanostructure array", specs: ["Period: 200-400nm", "3D or 2D arrays", "Tunable via structure"] },
+      { name: "Nano-Grating", description: "Diffraction grating pattern", specs: ["Period: 200-500nm", "Aspect ratio: 1-3", "Multiple colors per area"] },
+    ],
+    realWorldApplications: ["Cosmetics (eye shadow, nail polish)", "Security features (counterfeit prevention)", "Fabric design"],
+  },
+
+  // ===== WATER MANAGEMENT =====
+  {
+    id: "desert-beetle-1",
+    organism: "Desert Beetle (Stenocara)",
+    scientificName: "Stenocara gracilipes",
+    category: "Water Management & Collection",
+    challenge: "Passive Water Harvesting",
+    mechanism: "Shell has bumpy hydrophilic (water-loving) peaks and waxy hydrophobic (water-repelling) valleys. Fog condenses on peaks, water rolls down into valleys, collected and directed to mouth.",
+    advantage: "Passive water collection from fog/humidity, no energy input, 100% collection efficiency from fog",
+    implementation: "Textured surface with alternating hydrophilic/hydrophobic regions designed for directional water flow",
+    image: "🪲",
+    tags: ["water", "collection", "passive", "sustainability"],
+    metrics: { efficiency: 0.94, sustainability: 0.97, manufacturability: 0.78 },
+    designVariants: [
+      { name: "Biomimetic Mesh", description: "Patterned surface for water collection", specs: ["Peak spacing: 0.5-2mm", "Collection efficiency: >95%", "Fog capture: 1-3L/m²/day"] },
+      { name: "Directional Channels", description: "Guided water flow system", specs: ["Angled valleys", "Self-cleaning", "Gravity-driven"] },
+      { name: "Composite Surface", description: "Permanent hydrophobic/hydrophilic pattern", specs: ["Self-maintenance", "Durable", "Scalable"] },
+    ],
+    realWorldApplications: ["Fog harvesting nets", "Drought-resistant water collection", "Sustainable water systems"],
+  },
+
+  {
+    id: "cactus-water-storage-1",
+    organism: "Cactus (Saguaro)",
+    scientificName: "Carnegiea gigantea",
+    category: "Water Management & Storage",
+    challenge: "Efficient Water Storage in Dry Conditions",
+    mechanism: "Waxy cuticle reduces evaporation. Shallow root system absorbs moisture quickly. Expandable stem stores water. Spines provide shade and channel condensation.",
+    advantage: "Minimal water loss, efficient storage, expandable capacity, self-shading",
+    implementation: "Absorbent polymer core with protective waxy exterior, water-retaining gel layers",
+    image: "🌵",
+    tags: ["water", "storage", "efficiency", "desert"],
+    metrics: { efficiency: 0.91, sustainability: 0.95, manufacturability: 0.74 },
+    designVariants: [
+      { name: "Expandable Storage Core", description: "Water-absorbent gel polymer", specs: ["Capacity: 5-10x initial volume", "Evaporation reduction: 99%", "Dehydration reversible"] },
+      { name: "Protective Coating", description: "Waxy hydrophobic layer", specs: ["Evaporation loss: <5%/month", "Temperature stable", "UV resistant"] },
+      { name: "Collection & Channeling", description: "Spine-guided water system", specs: ["Condensation capture", "Directed to root zone", "Passive operation"] },
+    ],
+    realWorldApplications: ["Super-absorbent polymers (SAP)", "Desert agriculture", "Water retention in soil"],
+  },
+
+  // ===== FILTRATION & SEPARATION =====
+  {
+    id: "whale-baleen-1",
+    organism: "Whale Baleen",
+    scientificName: "Balaenoptera musculus (blue whale)",
+    category: "Filtration & Separation",
+    challenge: "Efficient Filter for Small Particles",
+    mechanism: "Baleen plates are keratinous (protein) material with parallel fibers creating sieve-like structure. Spacing is tunable based on whale species (10µm to 1cm). Efficient filtration while maintaining water flow.",
+    advantage: "Efficient filtration, self-cleaning (fibers don't clog), tunable pore size, biodegradable material",
+    implementation: "Parallel fiber arrays with controlled spacing using extrusion or electrospinning",
+    image: "🐋",
+    tags: ["filtration", "separation", "efficient", "water"],
+    metrics: { efficiency: 0.93, sustainability: 0.94, manufacturability: 0.80 },
+    designVariants: [
+      { name: "Parallel Fiber Array", description: "Baleen-like fiber matrix", specs: ["Pore size: 10µm-1cm", "High flow rate", "Low clogging"] },
+      { name: "Hierarchical Filter", description: "Multiple size stages", specs: ["Progressive filtration", "Increased capacity", "Self-cleaning layers"] },
+      { name: "Bio-Membrane", description: "Protein-based filter material", specs: ["Biodegradable", "Non-toxic", "Replaceable"] },
+    ],
+    realWorldApplications: ["Water filtration systems", "Air filtration", "Industrial separation"],
+  },
+
+  {
+    id: "sponge-filtration-1",
+    organism: "Sea Sponge",
+    scientificName: "Porifera (phylum)",
+    category: "Filtration & Water Processing",
+    challenge: "Efficient Particle Filtration with High Flow",
+    mechanism: "Complex porous structure with interconnected channels. Specialized cells (choanocytes) create water flow and filter food particles. Can filter 20,000x its volume daily.",
+    advantage: "Extremely efficient filtration, high water flow, self-cleaning, natural antibacterial, tunable porosity",
+    implementation: "Porous foam or gel structure with optimized channel geometry and active pumping mechanism",
+    image: "🧽",
+    tags: ["filtration", "porous", "water", "efficient"],
+    metrics: { efficiency: 0.96, sustainability: 0.95, manufacturability: 0.73 },
+    designVariants: [
+      { name: "Porous Foam Matrix", description: "Interconnected sponge structure", specs: ["Porosity: 90-97%", "Pore size: 1-100µm", "Flow rate: High"] },
+      { name: "Spiral Channel Design", description: "Optimized water flow paths", specs: ["Self-cleaning vortex action", "Minimal clogging", "Scalable"] },
+      { name: "Bio-Inspired Separator", description: "Multi-stage filtration system", specs: ["Particle size: 0.5-1000µm", "Dual action: filter + separate", "Tunable separation"] },
+    ],
+    realWorldApplications: ["Industrial water treatment", "Aquaculture systems", "Bioreactors"],
+  },
+
+  {
+    id: "diatom-filtration-1",
+    organism: "Diatom (Navicula)",
+    scientificName: "Bacillariophyceae (class)",
+    category: "Filtration & Nanostructure",
+    challenge: "Ultra-Fine Particle Filtration",
+    mechanism: "Silica shell (frustule) with regular nanopore arrays (20-500nm). Used in water filters and industrial separation. Self-assembling structure.",
+    advantage: "Ultra-fine filtration (nanometer scale), self-assembled structure, sustainable material (silica)",
+    implementation: "Silica nanostructures with regular pore patterns using diatom-inspired synthesis",
+    image: "🔬",
+    tags: ["filtration", "nanostructure", "separation", "silica"],
+    metrics: { efficiency: 0.94, sustainability: 0.92, manufacturability: 0.65 },
+    designVariants: [
+      { name: "Nano-Pore Array", description: "Regular nanoscale holes", specs: ["Pore size: 20-500nm", "Pore density: 10⁸/cm²", "Ultrafiltration"] },
+      { name: "Bio-Silica Shell", description: "Silica diatom-inspired structure", specs: ["High mechanical strength", "Chemical stability", "Reusable"] },
+      { name: "Self-Assembling Membrane", description: "Self-organizing filter structure", specs: ["No fabrication needed", "Scalable", "Cost-effective"] },
+    ],
+    realWorldApplications: ["Nanofiltration membranes", "Gas separation", "Biosensors"],
+  },
+
+  // ===== ENERGY SYSTEMS =====
+  {
+    id: "photosynthesis-1",
+    organism: "Leaf Photosynthesis",
+    scientificName: "Plantae (kingdom)",
+    category: "Energy Conversion & Harvesting",
+    challenge: "Efficient Light-to-Chemical Energy Conversion",
+    mechanism: "Photosystem II and I use chlorophyll and electron transport chains to convert light directly to chemical energy (ATP, NADPH). Uses quantum coherence for near-100% quantum yield.",
+    advantage: "99% quantum efficiency possible (vs. solar cell 85%), room temperature operation, self-repairing, renewable",
+    implementation: "Artificial photosynthesis using similar electron transport chains, quantum dots, or metal-organic frameworks",
+    image: "🍃",
+    tags: ["energy", "conversion", "photosynthesis", "efficiency"],
+    metrics: { efficiency: 0.99, sustainability: 0.99, manufacturability: 0.45 },
+    designVariants: [
+      { name: "Electron Transport Chain", description: "Quantum-efficient light conversion", specs: ["Quantum yield: >90%", "Multiple wavelength capture", "Room temperature"] },
+      { name: "Artificial Chloroplast", description: "Synthetic photosynthetic unit", specs: ["Converts light to fuel", "Produces oxygen", "Scalable"] },
+      { name: "Hybrid Bio-Electronic", description: "Living chloroplasts + electronic components", specs: ["Biological efficiency", "Electronic control", "Integrated system"] },
+    ],
+    realWorldApplications: ["Artificial photosynthesis", "Solar fuels", "Bio-hybrid solar cells"],
+  },
+
+  {
+    id: "firefly-bioluminescence-1",
+    organism: "Firefly Light Production",
+    scientificName: "Lampyridae (family)",
+    category: "Energy & Light Generation",
+    challenge: "Efficient Light Generation at Low Temperature",
+    mechanism: "Luciferin enzyme reaction produces light with near-100% quantum efficiency (vs. LED ~40%). No heat loss. Uses ATP energy.",
+    advantage: "Cold light (no heat), near-100% efficiency, adjustable frequency, renewable",
+    implementation: "Luciferin-luciferase enzyme system in gel matrix, ATP-powered light production",
+    image: "✨",
+    tags: ["bioluminescence", "light", "efficiency", "energy"],
+    metrics: { efficiency: 0.99, sustainability: 0.92, manufacturability: 0.55 },
+    designVariants: [
+      { name: "Luciferin Complex", description: "Enzyme-substrate light system", specs: ["Wavelength: 510-620nm", "Efficiency: 88%", "On/off control"] },
+      { name: "Bio-Integrated LED", description: "Biological light in electronic form", specs: ["RGB color control", "Tunable intensity", "Renewable"] },
+      { name: "Photonic Packaging", description: "Optimized light collection", specs: ["Directional output", "Enhanced brightness", "Focused emission"] },
+    ],
+    realWorldApplications: ["Bio-LEDs", "Biomedical imaging", "Bioluminescent displays"],
+  },
+
+  // ===== DEFENSE & PROTECTION =====
+  {
+    id: "porcupine-quill-1",
+    organism: "Porcupine Quill",
+    scientificName: "Hystricidae (family)",
+    category: "Defense & Protection",
+    challenge: "Self-Deploying Protective Structure",
+    mechanism: "Hollow barbed quills with microscopic barbs. Barbs point backward making removal painful/difficult. Lightweight design. Deploy on contact.",
+    advantage: "Effective defense mechanism, lightweight, barbed design, self-deploying",
+    implementation: "Barbed hollow structures with reverse-direction barbs for difficult removal",
+    image: "🦔",
+    tags: ["defense", "protection", "barbed", "structure"],
+    metrics: { efficiency: 0.85, sustainability: 0.80, manufacturability: 0.70 },
+    designVariants: [
+      { name: "Barbed Quill Design", description: "Hollow shaft with backward barbs", specs: ["Barb angle: 30-45°", "Lightweight", "Quick deployment"] },
+      { name: "Composite Quill", description: "Multi-layer protective structure", specs: ["Outer layer: hard", "Inner: flexible", "Shock absorption"] },
+      { name: "Deployable Array", description: "Multiple quills in organized pattern", specs: ["Dense coverage", "Interlocking design", "Automatic deployment"] },
+    ],
+  },
+
+  {
+    id: "pangolin-scale-1",
+    organism: "Pangolin Scales",
+    scientificName: "Manis species",
+    category: "Defense & Armor",
+    challenge: "Interlocking Protective Armor",
+    mechanism: "Keratin scales overlap like roof tiles, creating overlapping armor. Each scale is hard on outside, flexible inside. Distributes impact stress.",
+    advantage: "Interlocking protection, stress distribution, flexibility maintained, self-healing potential",
+    implementation: "Overlapping scaled armor design with flexible substrates between scales",
+    image: "🦗",
+    tags: ["armor", "protection", "scale", "defense"],
+    metrics: { efficiency: 0.88, sustainability: 0.87, manufacturability: 0.76 },
+    designVariants: [
+      { name: "Overlapping Scale System", description: "Roof tile pattern armor", specs: ["Scale overlap: 50%", "Impact distribution", "Articulated joints"] },
+      { name: "Keratin Composite", description: "Protein-based protective layer", specs: ["Bioresorbable", "Self-renewing", "Tunable hardness"] },
+      { name: "Flexible Armor", description: "Scales on elastic substrate", specs: ["Full articulation", "Impact absorption", "Lightweight"] },
+    ],
+  },
+
+  {
+    id: "cuttlefish-camouflage-1",
+    organism: "Cuttlefish Color Change",
+    scientificName: "Sepiida (order)",
+    category: "Camouflage & Adaptation",
+    challenge: "Rapid Adaptive Camouflage System",
+    mechanism: "Three layer system: chromatophores (color), iridophores (reflective), leucophores (white). Neural control activates pigment cells in 200ms. Can match any background in seconds.",
+    advantage: "Rapid adaptation, neural control, complete camouflage, works for any background",
+    implementation: "Smart pigment layers with electrical/chemical activation for rapid color change",
+    image: "🐙",
+    tags: ["camouflage", "color", "adaptive", "responsive"],
+    metrics: { efficiency: 0.90, sustainability: 0.85, manufacturability: 0.60 },
+    designVariants: [
+      { name: "Chromatophore Layer", description: "Pigment-filled sacs with neural control", specs: ["Response time: 200ms", "Color range: full spectrum", "Reversible"] },
+      { name: "Multi-Layer System", description: "Chromatophore + iridophore + leucophore", specs: ["Texture matching", "Pattern generation", "3D camouflage"] },
+      { name: "Smart Textile", description: "Fabric with color-changing capability", specs: ["Wearable camouflage", "Environmental sensing", "Real-time adaptation"] },
+    ],
+  },
+
+  // ===== MOVEMENT & LOCOMOTION =====
+  {
+    id: "snake-locomotion-1",
+    organism: "Snake Lateral Undulation",
+    scientificName: "Serpentes (suborder)",
+    category: "Movement & Locomotion",
+    challenge: "Flexible Efficient Ground Movement",
+    mechanism: "Spine with 200+ vertebrae provides flexibility. Ribs and scales create friction. Lateral S-curves propel body forward. No limbs needed.",
+    advantage: "Maximum flexibility, minimal energy for movement, adaptable to terrain, access tight spaces",
+    implementation: "Flexible cable system with ripple-based locomotion, or serpenoid motion patterns",
+    image: "🐍",
+    tags: ["locomotion", "movement", "flexible", "efficiency"],
+    metrics: { efficiency: 0.88, sustainability: 0.82, manufacturability: 0.71 },
+    designVariants: [
+      { name: "Serpenoid Robot", description: "S-curve undulating motion", specs: ["Joints: 10-20 segments", "Flexible cable drive", "Terrain adaptive"] },
+      { name: "Cable-Driven Actuator", description: "Tension-based motion control", specs: ["Smooth curves", "Efficient motion", "Scalable length"] },
+      { name: "Modular Spine", description: "Segmented articulated structure", specs: ["Interchangeable segments", "Variable stiffness", "Customizable"] },
+    ],
+  },
+
+  {
+    id: "penguin-swimming-1",
+    organism: "Penguin Swimming",
+    scientificName: "Spheniscidae (family)",
+    category: "Movement & Hydrodynamics",
+    challenge: "Efficient Underwater Propulsion",
+    mechanism: "Wings modified for underwater flight, not aerial. Flipper motion similar to bird wings. Streamlined body reduces drag. Can reach 25 km/h speed.",
+    advantage: "Highly efficient swimming, high speed, underwater maneuverability, streamlined design",
+    implementation: "Flipper-based underwater propulsion with streamlined hull design",
+    image: "🐧",
+    tags: ["swimming", "propulsion", "efficiency", "hydrodynamic"],
+    metrics: { efficiency: 0.92, sustainability: 0.88, manufacturability: 0.79 },
+    designVariants: [
+      { name: "Wing-Based Propulsion", description: "Flipper motion for thrust", specs: ["Speed: 20-30 km/h", "Maneuverability: High", "Energy efficiency: Excellent"] },
+      { name: "Streamlined Hull", description: "Torpedo-shaped underwater body", specs: ["Drag coefficient: minimal", "Hydrodynamic profile", "Low resistance"] },
+      { name: "Hybrid Propeller", description: "Wing-inspired propeller design", specs: ["Oscillating motion", "Efficient thrust", "Quiet operation"] },
+    ],
+  },
+
+  {
+    id: "cheetah-running-1",
+    organism: "Cheetah High-Speed Running",
+    scientificName: "Acinonyx jubatus",
+    category: "Movement & Speed",
+    challenge: "High-Speed Ground Movement",
+    mechanism: "Flexible spine, long legs, non-retractable claws for traction, aerodynamic body. Can reach 120 km/h. Specialized muscles for acceleration/deceleration.",
+    advantage: "Maximum speed, rapid acceleration, efficient running gait, terrain adaptable",
+    implementation: "Articulated leg design with flexible spine and efficient muscles",
+    image: "🐆",
+    tags: ["speed", "running", "locomotion", "acceleration"],
+    metrics: { efficiency: 0.91, sustainability: 0.80, manufacturability: 0.75 },
+    designVariants: [
+      { name: "Flexible Spine System", description: "Articulated backbone for stride extension", specs: ["Stride: 7-8 meters", "Speed: 100-120 km/h", "Acceleration: Rapid"] },
+      { name: "Grip-Enhanced Feet", description: "Non-retractable claws for traction", specs: ["Traction: 100%", "Turning: sharp angles", "Grip: any terrain"] },
+      { name: "Aerodynamic Form", description: "Streamlined body for speed", specs: ["Drag: minimal", "Weight: optimized", "Power: distributed"] },
+    ],
+  },
+
+  // ===== SENSING & COMMUNICATION =====
+  {
+    id: "echolocation-1",
+    organism: "Bat Echolocation",
+    scientificName: "Chiroptera (order)",
+    category: "Sensing & Navigation",
+    challenge: "Three-Dimensional Navigation & Detection",
+    mechanism: "Emits high-frequency sound waves (20-200 kHz), listens to echoes. Brain processes timing/frequency shifts to create 3D image. Resolution ~1cm. Works in complete darkness.",
+    advantage: "Works in darkness, 3D sensing, obstacle avoidance, prey detection, active sensing",
+    implementation: "Acoustic sensor system with digital signal processing for echo interpretation",
+    image: "🦇",
+    tags: ["sensing", "echolocation", "navigation", "sonar"],
+    metrics: { efficiency: 0.93, sustainability: 0.85, manufacturability: 0.68 },
+    designVariants: [
+      { name: "Active Sonar System", description: "Sound-based 3D imaging", specs: ["Frequency: 20-200kHz", "Range: 10-20 meters", "Resolution: 1cm"] },
+      { name: "Signal Processing Engine", description: "Real-time echo analysis", specs: ["Processing: <100ms", "Obstacle detection: reliable", "Frequency analysis: multi-dimensional"] },
+      { name: "Adaptive Frequency", description: "Frequency modulation for conditions", specs: ["Frequency range: tunable", "Distance adaptive", "Selective hearing"] },
+    ],
+  },
+
+  {
+    id: "bioluminescent-communication-1",
+    organism: "Firefly Flashing Patterns",
+    scientificName: "Lampyridae (family)",
+    category: "Communication & Signaling",
+    challenge: "Long-Range Wireless Communication",
+    mechanism: "Species-specific flashing patterns communicate location and identity. Patterns vary: double flashes, J-shaped flashes, etc. Males flash, females respond if interested.",
+    advantage: "Long-range communication, species recognition, pattern-based encoding, efficient light",
+    implementation: "Bioluminescent communication pattern system with modulated light output",
+    image: "💡",
+    tags: ["communication", "bioluminescence", "signaling", "pattern"],
+    metrics: { efficiency: 0.87, sustainability: 0.90, manufacturability: 0.62 },
+    designVariants: [
+      { name: "Flash Pattern Encoding", description: "Species-specific light sequences", specs: ["Pattern: unique per species", "Range: 100+ meters", "Recognition: reliable"] },
+      { name: "Modulated Emission", description: "Controllable light output", specs: ["On/off frequency: 0.5-10Hz", "Intensity: adjustable", "Color: tunable"] },
+      { name: "Directional Broadcast", description: "Focused light emission", specs: ["Directionality: focused", "Range: extended", "Efficiency: high"] },
+    ],
+  },
+
+  {
+    id: "magnetoreception-1",
+    organism: "Migratory Bird Navigation",
+    scientificName: "Aves (class) - migratory species",
+    category: "Sensing & Navigation",
+    challenge: "Long-Distance Navigation Without Maps",
+    mechanism: "Birds sense Earth's magnetic field using magnetite crystals in eyes (quantum compass) or iron-protein complexes in beak. Combined with sun position and landmarks.",
+    advantage: "Long-distance navigation, no external tools needed, automatic path finding, global scale",
+    implementation: "Magnetometer-based compass system with biological signal processing",
+    image: "🦅",
+    tags: ["navigation", "sensing", "magnetism", "migration"],
+    metrics: { efficiency: 0.90, sustainability: 0.92, manufacturability: 0.64 },
+    designVariants: [
+      { name: "Quantum Compass", description: "Magnetite-based detection", specs: ["Sensitivity: nanoTesla", "Accuracy: 1°", "Biological mechanism"] },
+      { name: "Protein Compass", description: "Iron-protein magnetic sensing", specs: ["Detection: Earth's field", "Directional: continuous", "Integration: biological"] },
+      { name: "Multi-Modal Navigation", description: "Magnetism + sun + landmarks", specs: ["Redundancy: high", "Accuracy: excellent", "Robustness: proven"] },
+    ],
+  },
+
+  // ===== SELF-ASSEMBLY & ORGANIZATION =====
+  {
+    id: "dna-structure-1",
+    organism: "DNA Self-Assembly",
+    scientificName: "Homo sapiens genome",
+    category: "Self-Assembly & Information Storage",
+    challenge: "Molecular Self-Assembly & Storage",
+    mechanism: "Four nucleotide bases (A-T, G-C) pair through hydrogen bonds in predictable patterns. Double helix forms spontaneously. Stores genetic information with error correction.",
+    advantage: "Self-organizing at molecular scale, information-rich storage, error correction, replication capability",
+    implementation: "DNA nanotechnology for programmable self-assembly structures",
+    image: "🧬",
+    tags: ["self-assembly", "nanotechnology", "information", "molecular"],
+    metrics: { efficiency: 0.98, sustainability: 0.99, manufacturability: 0.52 },
+    designVariants: [
+      { name: "DNA Origami", description: "Designed 2D/3D DNA structures", specs: ["Feature size: 10nm", "Programmable shape", "Addressable components"] },
+      { name: "DNA Circuits", description: "Logic gates from DNA strand displacement", specs: ["Computation: molecular level", "Gates: AND, OR, NOT", "Programmable"] },
+      { name: "DNA Storage", description: "Information storage in DNA sequences", specs: ["Density: 215 Petabytes/gram", "Longevity: centuries", "Reliable"] },
+    ],
+  },
+
+  {
+    id: "virus-assembly-1",
+    organism: "Virus Self-Assembly",
+    scientificName: "Viruses (all types)",
+    category: "Self-Assembly & Organization",
+    challenge: "Self-Assembling Protective Structures",
+    mechanism: "Protein subunits spontaneously assemble into icosahedra or helical structures. No external direction needed. Optimal packing geometry.",
+    advantage: "Self-organizing, efficient packing, protective shells, minimal material use",
+    implementation: "Engineered protein subunits for programmable self-assembly",
+    image: "🦠",
+    tags: ["self-assembly", "structure", "protein", "organization"],
+    metrics: { efficiency: 0.96, sustainability: 0.94, manufacturability: 0.59 },
+    designVariants: [
+      { name: "Icosahedral Shell", description: "20-sided protein structure", specs: ["Symmetry: high", "Packing: efficient", "Protection: complete"] },
+      { name: "Helical Arrangement", description: "Linear protein coiling", specs: ["Flexibility: high", "Scalable length", "Dynamic structure"] },
+      { name: "Programmable Assembly", description: "Designed protein interactions", specs: ["Customizable shape", "Tunable size", "Functional payloads"] },
+    ],
+  },
+
+  // ===== ADDITIONAL SPECIALIZED SOLUTIONS =====
+  {
+    id: "giraffe-spots-1",
+    organism: "Giraffe Spot Pattern",
+    scientificName: "Giraffa camelopardalis",
+    category: "Thermal Management & Camouflage",
+    challenge: "Efficient Thermoregulation and Camouflage",
+    mechanism: "Irregular spot pattern distributes heat through color differences. Darker spots absorb more heat (for sun), lighter areas reflect. Pattern provides camouflage in dappled light.",
+    advantage: "Dual function (heat + camouflage), efficient temperature regulation, natural pattern",
+    implementation: "Patterned surface with varying thermal properties",
+    image: "🦒",
+    tags: ["thermal", "camouflage", "pattern", "regulation"],
+    metrics: { efficiency: 0.85, sustainability: 0.90, manufacturability: 0.78 },
+    designVariants: [
+      { name: "Thermal Pattern", description: "Heat-absorbing spot design", specs: ["Dark regions: +5-10°C", "Light regions: cool", "Self-regulating"] },
+      { name: "Camouflage Pattern", description: "Dappled shadow mimicry", specs: ["Pattern: fractal-like", "Effectiveness: high", "Visual: natural"] },
+      { name: "Dynamic Pattern", description: "Changeable thermal pattern", specs: ["Temperature adaptive", "Passive adjustment", "Material properties tuned"] },
+    ],
+  },
+
+  {
+    id: "coral-reef-1",
+    organism: "Coral Reef Structure",
+    scientificName: "Scleractinia (order)",
+    category: "Structures & Ecosystems",
+    challenge: "Efficient Porous Strong Structure with Ecosystem",
+    mechanism: "Calcium carbonate skeleton provides structure. Porous design allows water flow. Symbiotic relationship with zooxanthellae for energy. Creates habitat for 1000s of species.",
+    advantage: "Efficient ecosystem, strong yet porous, self-building, energy positive, biodiverse",
+    implementation: "Porous calcium carbonate structure with bio-integrated components",
+    image: "🪸",
+    tags: ["structure", "ecosystem", "porous", "strong"],
+    metrics: { efficiency: 0.92, sustainability: 0.98, manufacturability: 0.68 },
+    designVariants: [
+      { name: "Porous Skeleton", description: "Calcium carbonate branching structure", specs: ["Porosity: 70-80%", "Water flow: optimized", "Strength: sufficient"] },
+      { name: "Biodiversity Matrix", description: "Multi-species integrated structure", specs: ["Species: 100s+", "Symbiosis: integral", "Stability: high"] },
+      { name: "Self-Building", description: "Bio-mediated construction", specs: ["Growth: autonomous", "Material: renewable", "Zero waste"] },
+    ],
+  },
+
+  {
+    id: "mycelium-network-1",
+    organism: "Fungal Mycelium Network",
+    scientificName: "Fungi kingdom",
+    category: "Communication & Distribution",
+    challenge: "Efficient Nutrient Distribution Network",
+    mechanism: "Thread-like fungal filaments create massive underground network. Share nutrients between plants. Communicate chemical signals. Can connect entire forest.",
+    advantage: "Efficient distribution, self-organizing, scalable network, communication capability, sustainable",
+    implementation: "Network topology optimization inspired by mycelium for distribution systems",
+    image: "🍄",
+    tags: ["network", "distribution", "communication", "efficiency"],
+    metrics: { efficiency: 0.94, sustainability: 0.97, manufacturability: 0.71 },
+    designVariants: [
+      { name: "Filament Network", description: "Thread-based distribution system", specs: ["Density: 100+ km per cubic meter", "Connectivity: mesh", "Scalable"] },
+      { name: "Nutrient Shuttling", description: "Active transport system", specs: ["Distribution: equal", "Allocation: dynamic", "Efficiency: 95%"] },
+      { name: "Chemical Signaling", description: "Information network on distribution", specs: ["Communication: chemical", "Speed: hours", "Reach: unlimited"] },
+    ],
+  },
+
+  {
+    id: "sloth-fur-ecosystem-1",
+    organism: "Three-Toed Sloth Fur Ecosystem",
+    scientificName: "Bradypus variegatus",
+    category: "Symbiosis & Efficiency",
+    challenge: "Integrated Living Ecosystem on Organism",
+    mechanism: "Sloth fur hosts algae that provides camouflage, moths that lay eggs and help algae growth, fungi and bacteria. Three-way symbiosis. Sloth hosts mobile ecosystem.",
+    advantage: "Self-maintaining ecosystem, camouflage, nutrient cycling, integrated services",
+    implementation: "Multi-organism integrated system with symbiotic relationships",
+    image: "🦥",
+    tags: ["symbiosis", "ecosystem", "efficiency", "integrated"],
+    metrics: { efficiency: 0.88, sustainability: 0.99, manufacturability: 0.45 },
+    designVariants: [
+      { name: "Algae-Host Symbiosis", description: "Mutual benefit algae on fur", specs: ["Coverage: 30-60%", "Camouflage: effective", "Nutrient cycling: yes"] },
+      { name: "Multi-Level Integration", description: "Multiple species cooperation", specs: ["Species: 3-4", "Dependencies: circular", "Stability: self-reinforcing"] },
+      { name: "Portable Ecosystem", description: "Movable integrated system", specs: ["Mobility: preserved", "Ecosystem: contained", "Efficiency: maximized"] },
+    ],
+  },
+
+  // Add more solutions for other categories
+  {
+    id: "woodpecker-damping-1",
+    organism: "Woodpecker Skull Shock Absorption",
+    scientificName: "Picidae (family)",
+    category: "Impact Protection & Damping",
+    challenge: "Shock Absorption for High-Impact Activity",
+    mechanism: "Specialized cartilage tissue between skull bones acts as shock absorber. Cushions impacts of 20x gravity with skull acceleration. Prevents brain damage from thousands of pecks daily.",
+    advantage: "Extreme shock absorption, reusable without fatigue, biological materials, tunable dampening",
+    implementation: "Cartilage or gel-based damping layers for impact protection",
+    image: "🐦",
+    tags: ["damping", "impact", "protection", "shock"],
+    metrics: { efficiency: 0.91, sustainability: 0.90, manufacturability: 0.75 },
+    designVariants: [
+      { name: "Cartilage Damper", description: "Bio-cartilage shock absorber", specs: ["Impact reduction: 95%", "Reusable: infinite", "Tunable density"] },
+      { name: "Gel Pad System", description: "Gel-based impact protection", specs: ["Absorption: efficient", "Recovery: fast", "Reusable"] },
+      { name: "Hierarchical Layers", description: "Multiple damping layers", specs: ["Progressive absorption", "Frequency tuned", "Multi-impact capable"] },
+    ],
+  },
+
+  {
+    id: "electric-eel-generation-1",
+    organism: "Electric Eel Bioelectricity",
+    scientificName: "Electrophorus electricus",
+    category: "Energy & Power Generation",
+    challenge: "Biological Electrical Power Generation",
+    mechanism: "Specialized electric organs with 5000+ cells arranged in series. Each cell generates ~0.15V through ion channel activation. Total: 600-860V discharge. Renewable power.",
+    advantage: "Biological energy generation, renewable, controlled output, integrated system",
+    implementation: "Bio-inspired electrochemical cells mimicking electric organ structure",
+    image: "⚡",
+    tags: ["energy", "bioelectricity", "power", "generation"],
+    metrics: { efficiency: 0.82, sustainability: 0.88, manufacturability: 0.58 },
+    designVariants: [
+      { name: "Electrochemical Cell Stack", description: "Series arrangement of power cells", specs: ["Voltage: 600V+", "Current: adjustable", "Frequency: controllable"] },
+      { name: "Biological Battery", description: "Living power generation", specs: ["Renewable: yes", "Recharge: automatic", "Output: variable"] },
+      { name: "Hybrid Bio-Electronic", description: "Bio cells + electronic control", specs: ["Efficiency: high", "Control: precise", "Output: optimized"] },
+    ],
+  },
+
+  {
+    id: "tardigrade-resilience-1",
+    organism: "Tardigrade Extreme Resilience",
+    scientificName: "Tardigrada (phylum)",
+    category: "Resilience & Adaptation",
+    challenge: "Survive Extreme Conditions",
+    mechanism: "Enter cryptobiosis (suspended animation) when conditions become extreme. Can survive vacuum, radiation, extreme temperatures (-273°C to 150°C), dehydration for 30+ years.",
+    advantage: "Extreme resilience, self-repairing at molecular level, long-term preservation capability",
+    implementation: "Cryoprotectant compounds and metabolic shutdown mechanisms",
+    image: "🔬",
+    tags: ["resilience", "adaptation", "survival", "extreme"],
+    metrics: { efficiency: 0.89, sustainability: 0.95, manufacturability: 0.52 },
+    designVariants: [
+      { name: "Cryptobiosis Mechanism", description: "Reversible suspended animation", specs: ["Duration: 30+ years", "Recovery: 100%", "Conditions: extreme"] },
+      { name: "Cryoprotectant System", description: "Molecular protection compounds", specs: ["Protection: cellular", "Recovery: reliable", "Reversible: yes"] },
+      { name: "DNA Repair System", description: "Self-healing genetic material", specs: ["Repair rate: extreme", "Damage tolerance: 5000 Gy", "Fidelity: high"] },
     ],
   },
 ];
