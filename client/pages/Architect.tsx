@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from "react";
+import { toast } from "sonner";
 import Header from "@/components/Header";
 import ThreeDViewer from "@/components/ThreeDViewer";
 import ARPreview from "@/components/ARPreview";
+import ComparisonView from "@/components/ComparisonView";
 import {
   Upload,
   Zap,
@@ -22,7 +24,7 @@ import {
   Smartphone,
 } from "lucide-react";
 import { organisms, problemExamples, BiologicalSolution } from "@shared/organisms";
-import { generatePDFReport, downloadSTL, generateShareLink } from "@/lib/export";
+import { generatePDFReport, downloadSTL, generateShareLink, copyToClipboard } from "@/lib/export";
 
 interface Solution extends BiologicalSolution {
   relevanceScore: number;
@@ -174,41 +176,78 @@ export default function Architect() {
   ];
 
   const handleExportPDF = async () => {
-    if (!selectedSolution) return;
+    if (!selectedSolution) {
+      toast.error("Please select a solution first");
+      return;
+    }
     setExportingPDF(true);
     try {
+      toast.loading("Generating PDF report...", { id: "pdf-export" });
       await generatePDFReport(challenge, selectedSolution, selectedVariant);
+      toast.success("PDF report downloaded! Check your downloads folder.", {
+        id: "pdf-export",
+      });
+    } catch (error) {
+      console.error("PDF export error:", error);
+      toast.error("Failed to generate PDF report", { id: "pdf-export" });
     } finally {
       setExportingPDF(false);
     }
   };
 
   const handleExportSTL = () => {
-    if (!selectedSolution) return;
+    if (!selectedSolution) {
+      toast.error("Please select a solution first");
+      return;
+    }
     setExportingSTL(true);
     try {
+      toast.loading("Generating 3D model (STL)...", { id: "stl-export" });
       const variant = selectedSolution.designVariants[selectedVariant];
       downloadSTL(selectedSolution.organism, variant.name);
+      toast.success("3D model ready for printing! Download started.", {
+        id: "stl-export",
+      });
+    } catch (error) {
+      console.error("STL export error:", error);
+      toast.error("Failed to generate STL file", { id: "stl-export" });
     } finally {
       setExportingSTL(false);
     }
   };
 
-  const handleShare = () => {
-    if (!selectedSolution) return;
+  const handleShare = async () => {
+    if (!selectedSolution) {
+      toast.error("Please select a solution first");
+      return;
+    }
+
     const shareLink = generateShareLink(challenge, selectedSolution.id);
     const shareText = `Check out this BioMimicry solution for "${challenge}" - inspired by ${selectedSolution.organism}`;
 
     if (navigator.share) {
-      navigator.share({
-        title: "BioMimicry Architect",
-        text: shareText,
-        url: shareLink,
-      });
+      try {
+        await navigator.share({
+          title: "BioMimicry Architect",
+          text: shareText,
+          url: shareLink,
+        });
+        toast.success("Solution shared successfully!");
+      } catch (error) {
+        if ((error as Error).name !== "AbortError") {
+          console.error("Share error:", error);
+          toast.error("Failed to share");
+        }
+      }
     } else {
       // Fallback: copy to clipboard
-      navigator.clipboard.writeText(shareLink);
-      alert("Share link copied to clipboard!");
+      try {
+        await copyToClipboard(shareLink);
+        toast.success("Share link copied to clipboard!");
+      } catch (error) {
+        console.error("Copy error:", error);
+        toast.error("Failed to copy link");
+      }
     }
   };
 
@@ -588,6 +627,14 @@ export default function Architect() {
                             </div>
                           ))}
                         </div>
+                      </div>
+
+                      {/* Comparison View */}
+                      <div>
+                        <h4 className="text-sm font-semibold text-foreground mb-3">
+                          Biological Inspiration vs. Engineering Solution
+                        </h4>
+                        <ComparisonView solution={solution} variant={selectedVariant} />
                       </div>
 
                       {/* 3D Visualization Viewer */}
