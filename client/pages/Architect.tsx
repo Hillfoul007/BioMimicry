@@ -448,6 +448,25 @@ export default function Architect() {
           {/* Solutions Section */}
           {solutions && (
             <div className="space-y-8 animate-fade-in">
+              {/* Challenge Display */}
+              <div className="bg-gradient-to-r from-emerald-50 to-blue-50 rounded-2xl border-2 border-emerald-200 p-8 shadow-lg">
+                <h3 className="text-sm font-bold text-gray-600 uppercase tracking-wide mb-3">
+                  Your Challenge
+                </h3>
+                <p className="text-2xl font-bold text-gray-900 mb-4">
+                  {challenge}
+                </p>
+                {file && (
+                  <div className="flex items-center gap-3 p-4 bg-white rounded-xl border-2 border-emerald-200">
+                    <Upload className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-bold text-gray-900">Uploaded Design File</p>
+                      <p className="text-xs text-gray-600">{file.name}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Results Header */}
               <div className="flex items-center justify-between flex-wrap gap-4">
                 <div className="space-y-2">
@@ -455,7 +474,7 @@ export default function Architect() {
                     Nature-Inspired Solutions
                   </h2>
                   <p className="text-lg text-gray-600">
-                    {solutions.length} biomimetic solutions ranked by AI relevance score
+                    {solutions.length} unique biomimetic solutions ranked by AI relevance score
                   </p>
                 </div>
                 <button

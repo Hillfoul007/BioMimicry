@@ -370,14 +370,13 @@ const baseOrganisms = [
   },
 ];
 
-// Function to generate massive variation of solutions
+// Function to generate massive diverse solutions
 function generateSolutions(): BiologicalSolution[] {
   const solutions: BiologicalSolution[] = [];
   let idCounter = 0;
 
-  // Create base + variations for each organism
+  // Add all base organisms directly (no duplicates)
   baseOrganisms.forEach((org) => {
-    // Create main solution
     solutions.push({
       id: `bio-${idCounter++}`,
       organism: org.organism,
@@ -404,109 +403,294 @@ function generateSolutions(): BiologicalSolution[] {
         ],
       })),
     });
-
-    // Generate 40 variations of each organism by tweaking parameters
-    for (let i = 0; i < 40; i++) {
-      const variation = `${org.organism} - Variant ${i + 1}`;
-      const modifiedMechanism = `${org.mechanism} with optimization level ${i + 1}`;
-      
-      solutions.push({
-        id: `bio-${idCounter++}`,
-        organism: variation,
-        scientificName: org.scientificName,
-        category: org.category,
-        challenge: org.challenge,
-        mechanism: modifiedMechanism,
-        advantage: org.advantage,
-        implementation: org.implementation,
-        image: org.image,
-        tags: [...org.tags, `variant-${i}`, `iteration-${Math.floor(i / 10)}`],
-        metrics: {
-          efficiency: 0.65 + Math.random() * 0.33,
-          sustainability: 0.70 + Math.random() * 0.29,
-          manufacturability: 0.55 + Math.random() * 0.43,
-        },
-        designVariants: org.variants.map((v, idx) => ({
-          name: `${v} v${i + 1}`,
-          description: `${v} variant adapted for iteration ${i + 1}`,
-          specs: [
-            `Optimization: ${Math.floor(50 + (i * 2))}%`,
-            `Performance: ${80 + Math.floor(Math.random() * 19)}%`,
-            `Cost factor: ${(1 + i * 0.05).toFixed(2)}x`,
-            `Maturity: ${["Prototype", "Development", "Production"][Math.floor(i / 13)]}`,
-          ],
-        })),
-      });
-    }
   });
 
-  // Additional organisms for expansion (adding more base organisms)
-  const additionalOrganisms = [
-    "Dragonfly Wing", "Peacock Feather", "Firefly Lantern", "Cat Eye", "Pit Viper Heat Pit",
-    "Dog Olfactory System", "Spider Vibration Sensing", "Cactus Water Storage", "Mangrove Salt Filtration",
-    "Dung Beetle Hydration", "Dinoflagellate Bioluminescence", "Whale Song Communication",
-    "Plant Leaf Photosynthesis", "Electric Eel Generation", "Gecko Climbing", "Jellyfish Propulsion",
-    "Springtail Jumping", "Tree Growth Pattern", "Nautilus Shell Spiral", "Starfish Regeneration",
-    "Crocodile Tooth Replacement", "Polar Bear Insulation", "Camel Heat Dissipation",
+  // Add truly diverse additional organisms (26 more base organisms)
+  const diverseOrganisms = [
+    {
+      organism: "Dragonfly Wing",
+      scientificName: "Anisoptera species",
+      category: "Aerodynamics & Hydrodynamics",
+      challenge: "Ultra-Fast Lightweight Aircraft Design",
+      mechanism: "Dragonfly wings have dual-wing system with independent movement",
+      advantage: "Ultra-fast maneuverability; minimal energy per distance",
+      implementation: "Design quad-wing aircraft with independent actuators",
+    },
+    {
+      organism: "Peacock Feather",
+      scientificName: "Pavo cristatus",
+      category: "Optics & Colors",
+      challenge: "Dynamic Structural Color Display",
+      mechanism: "Peacock feathers use multilayer interference for iridescent colors",
+      advantage: "Color changes with viewing angle; no pigments needed",
+      implementation: "Create angle-dependent photonic structures",
+    },
+    {
+      organism: "Firefly Lantern",
+      scientificName: "Photinus pyralis",
+      category: "Energy Harvesting",
+      challenge: "Ultra-Efficient Biological Light Production",
+      mechanism: "Firefly abdomen produces light with 95% quantum efficiency",
+      advantage: "Nearly all energy converts to light; no heat loss",
+      implementation: "Engineer bioluminescent proteins and optical guides",
+    },
+    {
+      organism: "Cat Eye Tapetum",
+      scientificName: "Felis catus",
+      category: "Optics & Colors",
+      challenge: "Low-Light Vision Enhancement",
+      mechanism: "Cat eyes have reflective layer (tapetum lucidum) doubling light capture",
+      advantage: "See in 6x lower light than humans; passive enhancement",
+      implementation: "Design reflective coatings for optical sensors",
+    },
+    {
+      organism: "Pit Viper Heat Sensor",
+      scientificName: "Crotalus species",
+      category: "Sensing & Detection",
+      challenge: "Infrared Temperature Detection",
+      mechanism: "Pit viper has sensitive pits detecting <0.03°C temperature difference",
+      advantage: "Detects prey in complete darkness; passive sensing",
+      implementation: "Create microbolometer arrays in reflector geometry",
+    },
+    {
+      organism: "Dog Olfactory System",
+      scientificName: "Canis lupus familiaris",
+      category: "Sensing & Detection",
+      challenge: "Ultra-Sensitive Chemical Detection",
+      mechanism: "Dogs smell parts-per-trillion using 300M olfactory receptors",
+      advantage: "Detect individual molecules; complex mixture analysis",
+      implementation: "Design chemical sensor arrays with pattern recognition",
+    },
+    {
+      organism: "Spider Vibration Sensing",
+      scientificName: "Araneae species",
+      category: "Sensing & Detection",
+      challenge: "Distributed Vibration Monitoring",
+      mechanism: "Spiders detect vibrations through web using lyriform organs",
+      advantage: "Ultra-sensitive distributed network; multiplexed information",
+      implementation: "Create vibration sensor networks using accelerometers",
+    },
+    {
+      organism: "Cactus Water Storage",
+      scientificName: "Cactaceae family",
+      category: "Water Management",
+      challenge: "Efficient Water Capture & Storage",
+      mechanism: "Cactus captures sparse rainfall with wide roots; stores with minimal loss",
+      advantage: "2-3x more water capture; stores for months; sustainable",
+      implementation: "Design high-surface collectors with low-evaporation storage",
+    },
+    {
+      organism: "Mangrove Salt Filtration",
+      scientificName: "Rhizophora species",
+      category: "Water Management",
+      challenge: "Seawater Desalination",
+      mechanism: "Mangrove roots filter 90% salt from seawater osmotically",
+      advantage: "Passive salt removal; freshwater recovery; sustainable",
+      implementation: "Engineer selective membrane systems using osmotic pressure",
+    },
+    {
+      organism: "Dung Beetle Moisture Harvesting",
+      scientificName: "Scarabaeus species",
+      category: "Water Management",
+      challenge: "Atmospheric Water Harvesting",
+      mechanism: "Beetle exoskeleton captures moisture through mixed-wettability",
+      advantage: "Harvests from 50% humidity air; passive; integrated",
+      implementation: "Create textured surfaces with alternating wettability",
+    },
+    {
+      organism: "Dinoflagellate Bioluminescence",
+      scientificName: "Dinophysis species",
+      category: "Communication & Signaling",
+      challenge: "Underwater Optical Communication",
+      mechanism: "Dinoflagellates emit light via chemiluminescence (near 100% efficiency)",
+      advantage: "High efficiency light; underwater communication; chemical energy",
+      implementation: "Design chemiluminescent reaction systems with optical guides",
+    },
+    {
+      organism: "Humpback Whale Song",
+      scientificName: "Megaptera novaeangliae",
+      category: "Communication & Signaling",
+      challenge: "Long-Distance Underwater Communication",
+      mechanism: "Whale songs travel 100+ km underwater using low frequencies",
+      advantage: "Long-range communication; penetrates water; complex information",
+      implementation: "Design low-frequency acoustic transmitters with strategic frequency selection",
+    },
+    {
+      organism: "Plant Leaf Photosynthesis",
+      scientificName: "Various species",
+      category: "Energy Harvesting",
+      challenge: "Direct Solar Energy to Chemical Conversion",
+      mechanism: "Leaves convert light to chemical energy with organized pigments",
+      advantage: "Direct solar energy capture; ambient temperature; produces useful products",
+      implementation: "Design photovoltaic systems or artificial photosynthesis",
+    },
+    {
+      organism: "Electric Eel",
+      scientificName: "Electrophorus electricus",
+      category: "Energy Harvesting",
+      challenge: "Biological Electrical Power Generation",
+      mechanism: "Eel generates 860V through stacked electroplaques (ion pumping)",
+      advantage: "Biological power; no moving parts; controllable output",
+      implementation: "Design stacked ion-pumping cells creating bioelectric potential",
+    },
+    {
+      organism: "Gecko Climbing",
+      scientificName: "Hemidactylus frenatus",
+      category: "Movement & Locomotion",
+      challenge: "Wall Climbing Without Adhesive",
+      mechanism: "Gecko climbs vertical/inverted using van der Waals forces on hairy feet",
+      advantage: "Climbs any surface; reversible adhesion; high speed",
+      implementation: "Create hairy climbing pads with optimal micro-structure",
+    },
+    {
+      organism: "Jellyfish Propulsion",
+      scientificName: "Aurelia aurita",
+      category: "Movement & Locomotion",
+      challenge: "Efficient Fluid Propulsion",
+      mechanism: "Jellyfish propel via pulsed jet using elastic bell contraction",
+      advantage: "10x more efficient than fish; works in density-stratified fluids",
+      implementation: "Design pulsed jet thrusters with elastic bell structures",
+    },
+    {
+      organism: "Springtail Jumping",
+      scientificName: "Collembola species",
+      category: "Movement & Locomotion",
+      challenge: "High-Performance Jumping",
+      mechanism: "Springtail uses spring-loaded furcula for extreme acceleration",
+      advantage: "10-100x body length jumps; minimal prep time; repeatable",
+      implementation: "Design elastic latching mechanisms for stored energy release",
+    },
+    {
+      organism: "Tree Growth Pattern",
+      scientificName: "Quercus species",
+      category: "Growth & Development",
+      challenge: "Self-Optimizing Structure Growth",
+      mechanism: "Trees grow by optimizing structure based on wind loads and light",
+      advantage: "Self-optimizing; minimal material; inherent strength; adaptive",
+      implementation: "Design computational growth models for stress-aware structures",
+    },
+    {
+      organism: "Nautilus Shell Spiral",
+      scientificName: "Nautilus pompilius",
+      category: "Growth & Development",
+      challenge: "Logarithmic Growth Scaling",
+      mechanism: "Nautilus creates progressively larger chambers following golden ratio",
+      advantage: "Optimal scaling; structural efficiency; minimal material per volume",
+      implementation: "Design systems following golden ratio/Fibonacci sequences",
+    },
+    {
+      organism: "Starfish Regeneration",
+      scientificName: "Asteroidea species",
+      category: "Self-Repair & Healing",
+      challenge: "Biological Self-Repair",
+      mechanism: "Starfish regrows lost limbs and organs through dedifferentiation",
+      advantage: "Complete regeneration; multiple parts replaceable; lifetime renewal",
+      implementation: "Engineer self-healing polymers or biological scaffolds",
+    },
+    {
+      organism: "Crocodile Tooth Replacement",
+      scientificName: "Crocodylus niloticus",
+      category: "Self-Repair & Healing",
+      challenge: "Continuous Component Replacement",
+      mechanism: "Crocodile continuously replaces teeth using multiple dental laminae",
+      advantage: "Lifetime tooth replacement; no decay failures; maintenance-free",
+      implementation: "Design distributed manufacturing for continuous component production",
+    },
+    {
+      organism: "Polar Bear Fur",
+      scientificName: "Ursus maritimus",
+      category: "Thermal Management",
+      challenge: "Extreme Cold Insulation",
+      mechanism: "Bear fur has hollow transparent hairs trapping air; dense underfur",
+      advantage: "Extreme insulation at minimal weight; UV protection",
+      implementation: "Design multi-scale insulation with hollow structures",
+    },
+    {
+      organism: "Camel Heat Dissipation",
+      scientificName: "Camelus dromedarius",
+      category: "Thermal Management",
+      challenge: "Desert Heat Dissipation",
+      mechanism: "Camel fur is thick with air spaces; light color reflects; minimizes water loss",
+      advantage: "2°C cooler in desert heat; minimal water loss; passive",
+      implementation: "Design light-colored porous materials for heat dissipation",
+    },
+    {
+      organism: "Desert Iguana Thermoregulation",
+      scientificName: "Dipsosaurus dorsalis",
+      category: "Thermal Management",
+      challenge: "Behavioral Thermal Buffering",
+      mechanism: "Iguana adjusts sun exposure and body position for temperature control",
+      advantage: "Maintains optimal temperature with minimal energy; behavioral control",
+      implementation: "Design smart surfaces with variable thermal properties",
+    },
+    {
+      organism: "Salmon Counter-Current Heat Exchange",
+      scientificName: "Salmo salar",
+      category: "Thermal Management",
+      challenge: "Efficient Heat Recovery",
+      mechanism: "Salmon uses blood vessels in gills for counter-current heat exchange",
+      advantage: "Prevents heat loss; maintains temperature; passive mechanism",
+      implementation: "Design counter-current heat exchangers mimicking gill structure",
+    },
+    {
+      organism: "Woodpecker Shock Absorption",
+      scientificName: "Picidae family",
+      category: "Materials & Structures",
+      challenge: "Impact Shock Absorption",
+      mechanism: "Woodpecker skull has spongy bone and cerebrospinal fluid absorbing impacts",
+      advantage: "Absorbs 1000+ Gs without injury; repeated high-impact operation",
+      implementation: "Create shock-absorbing structures using spongy materials",
+    },
   ];
 
-  additionalOrganisms.forEach((organism, idx) => {
-    const categories = [
-      "Optics & Colors", "Sensing & Detection", "Water Management", "Communication & Signaling",
-      "Energy Harvesting", "Movement & Locomotion", "Growth & Development",
-      "Self-Repair & Healing", "Thermal Management", "Aerodynamics & Hydrodynamics",
-    ];
-
-    const category = categories[idx % categories.length];
-
-    for (let i = 0; i < 30; i++) {
-      solutions.push({
-        id: `bio-${idCounter++}`,
-        organism: `${organism} - Model ${i + 1}`,
-        scientificName: `${organism.toLowerCase().replace(/ /g, "_")} sp.`,
-        category: category,
-        challenge: `Solve engineering problem using ${organism} principles`,
-        mechanism: `${organism} uses biological mechanism for optimal performance`,
-        advantage: `${60 + Math.random() * 35}% efficiency improvement`,
-        implementation: `Apply ${organism} design principles to engineering solution`,
-        image: "🧬",
-        tags: [category.toLowerCase().replace(/ /g, "-"), organism.toLowerCase(), `model-${i}`],
-        metrics: {
-          efficiency: 0.65 + Math.random() * 0.33,
-          sustainability: 0.70 + Math.random() * 0.29,
-          manufacturability: 0.55 + Math.random() * 0.43,
+  // Add all diverse organisms (each is a unique base solution)
+  diverseOrganisms.forEach((org) => {
+    solutions.push({
+      id: `bio-${idCounter++}`,
+      organism: org.organism,
+      scientificName: org.scientificName,
+      category: org.category,
+      challenge: org.challenge,
+      mechanism: org.mechanism,
+      advantage: org.advantage,
+      implementation: org.implementation,
+      image: "🧬",
+      tags: [org.category.toLowerCase().replace(/ /g, "-"), org.organism.toLowerCase()],
+      metrics: {
+        efficiency: 0.65 + Math.random() * 0.33,
+        sustainability: 0.70 + Math.random() * 0.29,
+        manufacturability: 0.55 + Math.random() * 0.43,
+      },
+      designVariants: [
+        {
+          name: "Standard Implementation",
+          description: `Basic implementation of ${org.organism} principles`,
+          specs: [
+            `Efficiency: ${(70 + Math.random() * 25).toFixed(0)}%`,
+            `Cost: Medium`,
+            `Scalability: High`,
+          ],
         },
-        designVariants: [
-          {
-            name: `Standard Implementation`,
-            description: `Basic implementation of ${organism} principles`,
-            specs: [
-              `Efficiency: ${(70 + Math.random() * 25).toFixed(0)}%`,
-              `Cost: Medium`,
-              `Scalability: High`,
-            ],
-          },
-          {
-            name: `Advanced Variant`,
-            description: `Optimized implementation with enhanced performance`,
-            specs: [
-              `Efficiency: ${(80 + Math.random() * 18).toFixed(0)}%`,
-              `Cost: High`,
-              `Scalability: Medium`,
-            ],
-          },
-          {
-            name: `Rapid Prototype`,
-            description: `Quick deployment version for initial testing`,
-            specs: [
-              `Efficiency: ${(60 + Math.random() * 20).toFixed(0)}%`,
-              `Cost: Low`,
-              `Scalability: High`,
-            ],
-          },
-        ],
-      });
-    }
+        {
+          name: "Advanced Variant",
+          description: `Optimized implementation with enhanced performance`,
+          specs: [
+            `Efficiency: ${(80 + Math.random() * 18).toFixed(0)}%`,
+            `Cost: High`,
+            `Scalability: Medium`,
+          ],
+        },
+        {
+          name: "Rapid Prototype",
+          description: `Quick deployment version for initial testing`,
+          specs: [
+            `Efficiency: ${(60 + Math.random() * 20).toFixed(0)}%`,
+            `Cost: Low`,
+            `Scalability: High`,
+          ],
+        },
+      ],
+    });
   });
 
   return solutions;
