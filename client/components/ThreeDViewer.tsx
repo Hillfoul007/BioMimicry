@@ -170,31 +170,33 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
     const createWhaleBlade = (group: THREE.Group) => {
       const points = [
         new THREE.Vector2(0, 0),
-        new THREE.Vector2(1.5, 0),
-        new THREE.Vector2(1.8, 0.3),
-        new THREE.Vector2(1.5, 0.6),
-        new THREE.Vector2(0, 0.6),
+        new THREE.Vector2(1.6, 0),
+        new THREE.Vector2(1.9, 0.35),
+        new THREE.Vector2(1.6, 0.7),
+        new THREE.Vector2(0, 0.7),
       ];
-      const bladeGeometry = new THREE.LatheGeometry(points, 32);
-      const bladeMaterial = new THREE.MeshPhongMaterial({
-        color: 0x4A90E2,
-        shininess: 40,
+      const bladeGeometry = new THREE.LatheGeometry(points, 48);
+      const bladeMaterial = new THREE.MeshStandardMaterial({
+        color: 0x3B82F6,
+        roughness: 0.35,
+        metalness: 0.2,
       });
       const blade = new THREE.Mesh(bladeGeometry, bladeMaterial);
       blade.castShadow = true;
       group.add(blade);
 
-      const tubercleGeometry = new THREE.IcosahedronGeometry(0.24, 3);
-      const tubercleMaterial = new THREE.MeshPhongMaterial({
-        color: 0x2E5C8A,
-        shininess: 35,
+      const tubercleGeometry = new THREE.SphereGeometry(0.28, 16, 16);
+      const tubercleMaterial = new THREE.MeshStandardMaterial({
+        color: 0x1E40AF,
+        roughness: 0.3,
+        metalness: 0.3,
       });
 
-      for (let i = 0; i < 16; i++) {
-        const x = (i / 15) * 3.4 - 1.7;
+      for (let i = 0; i < 18; i++) {
+        const x = (i / 17) * 3.6 - 1.8;
         const tubercle = new THREE.Mesh(tubercleGeometry, tubercleMaterial);
-        tubercle.position.set(x, 0.75, 0.05);
-        tubercle.scale.set(1.1, 0.9, 0.7);
+        tubercle.position.set(x, 0.85, 0.08);
+        tubercle.scale.set(1.2, 0.95, 0.8);
         tubercle.castShadow = true;
         group.add(tubercle);
       }
