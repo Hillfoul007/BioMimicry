@@ -19,6 +19,7 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
 
     // ========== ADVANCED SCENE SETUP ==========
     const scene = new THREE.Scene();
+
     sceneRef.current = scene;
 
     // Create advanced gradient environment
@@ -44,6 +45,7 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
       0.1,
       2000
     );
+
     camera.position.z = 8;
     cameraRef.current = camera;
 
@@ -54,13 +56,16 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
       precision: "highp",
       powerPreference: "high-performance",
     });
+
     renderer.setSize(
       containerRef.current.clientWidth,
       containerRef.current.clientHeight
     );
     renderer.shadowMap.enabled = true;
+
     renderer.shadowMap.type = THREE.PCFShadowShadowMap;
     renderer.shadowMap.autoUpdate = true;
+
     renderer.pixelRatio = Math.min(window.devicePixelRatio, 2);
     renderer.toneMappingExposure = 1.0;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -124,7 +129,24 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
     const createOrganismModel = () => {
       const group = new THREE.Group();
 
+    // Add ground plane for shadows
+    const groundGeometry = new THREE.PlaneGeometry(50, 50);
+    const groundMaterial = new THREE.ShadowMaterial({ opacity: 0.2 });
+    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -3;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    // Create model
+    const model = new THREE.Group();
+    modelRef.current = model;
+    scene.add(model);
+
+    // Create organism-specific models
+    const createOrganismModel = () => {
       if (organism?.includes("Termite")) {
+
         createTermiteMound(group);
       } else if (organism?.includes("Gecko")) {
         createGeckoFeet(group);
@@ -148,12 +170,44 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
         createDolphinHead(group);
       } else {
         createDefaultOrganism(group);
-      }
 
-      return group;
+      }
     };
 
+    createOrganismModel();
+
+    // Animation loop with smooth rotation and mouse control
+    let animationId: number;
+    const animate = () => {
+      animationId = requestAnimationFrame(animate);
+
+      if (modelRef.current) {
+        modelRef.current.rotation.x += 0.003;
+        modelRef.current.rotation.y += 0.007;
+      }
+
+      renderer.render(scene, camera);
+    };
+
+    animate();
+
+    // Handle window resize
+    const handleResize = () => {
+      if (!containerRef.current) return;
+
+      const width = containerRef.current.clientWidth;
+      const height = containerRef.current.clientHeight;
+
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    // Helper functions for model creation
     const createTermiteMound = (group: THREE.Group) => {
+
       // Main mound with high-detail geometry
       const moundGeometry = new THREE.IcosahedronGeometry(1.8, 5);
       const moundMaterial = createAdvancedMaterial(0x8B6F47, 0.1, 0.8);
@@ -175,10 +229,12 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
 
       const tubeGeometry = new THREE.TubeGeometry(spiralCurve, 40, 0.5, 12);
       const tubeMaterial = createAdvancedMaterial(0x9B5523, 0.2, 0.7);
+
       const tube = new THREE.Mesh(tubeGeometry, tubeMaterial);
       tube.castShadow = true;
       tube.receiveShadow = true;
       group.add(tube);
+
 
       // High-detail branching channels
       for (let i = 0; i < 14; i++) {
@@ -192,22 +248,26 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
           Math.cos(angle) * 2.6,
           height - 0.8,
           Math.sin(angle) * 2.6
+
         );
         channel.rotation.z = angle + Math.PI / 2;
         channel.castShadow = true;
         channel.receiveShadow = true;
         group.add(channel);
       }
+
     };
 
     const createGeckoFeet = (group: THREE.Group) => {
       // High-poly main foot pad
       const padGeometry = new THREE.BoxGeometry(2.4, 1.4, 0.7);
       const padMaterial = createAdvancedMaterial(0xD4A574, 0.2, 0.5);
+
       const pad = new THREE.Mesh(padGeometry, padMaterial);
       pad.castShadow = true;
       pad.receiveShadow = true;
       group.add(pad);
+
 
       // Detailed micro-scale bristles
       const bristleGeometry = new THREE.ConeGeometry(0.09, 1.5, 16);
@@ -217,10 +277,12 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
         for (let z = -0.3; z <= 0.3; z += 0.1) {
           const bristle = new THREE.Mesh(bristleGeometry, bristleMaterial);
           bristle.position.set(x, 0.9, z);
+
           bristle.castShadow = true;
           group.add(bristle);
         }
       }
+
 
       // Sub-bristles for hierarchical detail
       const subBristleGeometry = new THREE.ConeGeometry(0.04, 0.7, 10);
@@ -231,6 +293,7 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
           const subbristle = new THREE.Mesh(subBristleGeometry, subBristleMaterial);
           subbristle.position.set(x, 1.6, z);
           subbristle.scale.set(0.7, 0.7, 0.7);
+
           subbristle.castShadow = true;
           group.add(subbristle);
         }
@@ -246,13 +309,16 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
     };
 
     const createWhaleBlade = (group: THREE.Group) => {
+
       // High-detail main blade
       const bladeGeometry = new THREE.BoxGeometry(3.8, 0.9, 0.5);
       const bladeMaterial = createAdvancedMaterial(0x4A90E2, 0.4, 0.35);
+
       const blade = new THREE.Mesh(bladeGeometry, bladeMaterial);
       blade.castShadow = true;
       blade.receiveShadow = true;
       group.add(blade);
+
 
       // Detailed tubercles
       const tubercleGeometry = new THREE.IcosahedronGeometry(0.28, 4);
@@ -295,40 +361,38 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
       const positionArray = leafPositions.array as Float32Array;
 
       // Create organic wavy shape
+
       for (let i = 0; i < positionArray.length; i += 3) {
         const x = positionArray[i];
         const y = positionArray[i + 1];
         const z = positionArray[i + 2];
-
-        const distance = Math.sqrt(x * x + y * y);
         positionArray[i + 2] =
           z +
-          Math.sin(x * 2.5) * 0.4 +
-          Math.cos(y * 2.5) * 0.4 +
-          Math.sin(distance * 1.5) * 0.25 +
-          (Math.random() - 0.5) * 0.12;
+          Math.sin(x * 2.2) * 0.35 +
+          Math.cos(y * 2.2) * 0.35 +
+          Math.sin(x * 6) * Math.cos(y * 6) * 0.12;
       }
       leafPositions.needsUpdate = true;
       leafGeometry.computeVertexNormals();
 
-      const leafMaterial = createAdvancedMaterial(0x2ECC71, 0.25, 0.35);
+      const leafMaterial = new THREE.MeshPhongMaterial({
+        color: 0x2ECC71,
+        shininess: 60,
+      });
       const leaf = new THREE.Mesh(leafGeometry, leafMaterial);
       leaf.castShadow = true;
-      leaf.receiveShadow = true;
       group.add(leaf);
 
-      // Detailed micro-bumps
-      const bumpGeometry = new THREE.IcosahedronGeometry(0.18, 3);
-      const bumpMaterial = createAdvancedMaterial(0x27AE60, 0.2, 0.45);
+      const bumpGeometry = new THREE.SphereGeometry(0.18, 16, 16);
+      const bumpMaterial = new THREE.MeshPhongMaterial({
+        color: 0x27AE60,
+        shininess: 50,
+      });
 
-      for (let x = -1.7; x <= 1.7; x += 0.7) {
-        for (let y = -1.7; y <= 1.7; y += 0.7) {
+      for (let x = -1.5; x <= 1.5; x += 0.7) {
+        for (let y = -1.5; y <= 1.5; y += 0.7) {
           const bump = new THREE.Mesh(bumpGeometry, bumpMaterial);
-          bump.position.set(
-            x,
-            y,
-            0.7 + Math.random() * 0.3 + Math.sin(x) * 0.15
-          );
+          bump.position.set(x, y, 0.55 + Math.random() * 0.25);
           bump.castShadow = true;
           group.add(bump);
         }
@@ -356,14 +420,13 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
     const createSpiderWeb = (group: THREE.Group) => {
       const threadMaterial = new THREE.LineBasicMaterial({
         color: 0xE8E8E8,
-        linewidth: 2,
+        linewidth: 3,
       });
 
-      // Radial threads
-      for (let i = 0; i < 24; i++) {
-        const angle = (i / 24) * Math.PI * 2;
+      for (let i = 0; i < 20; i++) {
+        const angle = (i / 20) * Math.PI * 2;
         const points = [];
-        for (let r = 0; r <= 2.5; r += 0.25) {
+        for (let r = 0; r <= 2.2; r += 0.25) {
           points.push(
             new THREE.Vector3(Math.cos(angle) * r, Math.sin(angle) * r, 0)
           );
@@ -373,39 +436,38 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
         group.add(line);
       }
 
-      // Spiral threads
-      for (let ring = 0; ring < 10; ring++) {
-        const spiralPoints = [];
-        const startRadius = ring * 0.3;
-        for (let i = 0; i < 80; i++) {
-          const angle = (i / 80) * Math.PI * 2;
-          spiralPoints.push(
-            new THREE.Vector3(
-              Math.cos(angle) * (startRadius + 0.3),
-              Math.sin(angle) * (startRadius + 0.3),
-              0
-            )
-          );
-        }
-        const spiralGeometry = new THREE.BufferGeometry().setFromPoints(
-          spiralPoints
+      const spiralPoints = [];
+      for (let i = 0; i < 150; i++) {
+        const angle = (i / 150) * Math.PI * 10;
+        const radius = (i / 150) * 2.2;
+        spiralPoints.push(
+          new THREE.Vector3(
+            Math.cos(angle) * radius,
+            Math.sin(angle) * radius,
+            0
+          )
         );
         const spiral = new THREE.Line(spiralGeometry, threadMaterial);
         group.add(spiral);
       }
+      const spiralGeometry = new THREE.BufferGeometry().setFromPoints(spiralPoints);
+      const spiral = new THREE.Line(spiralGeometry, threadMaterial);
+      group.add(spiral);
 
-      // High-detail droplets
-      const dropletGeometry = new THREE.IcosahedronGeometry(0.16, 4);
-      const dropletMaterial = createAdvancedMaterial(0xB0E0E6, 0.8, 0.1);
+      const dropletGeometry = new THREE.SphereGeometry(0.14, 16, 16);
+      const dropletMaterial = new THREE.MeshPhongMaterial({
+        color: 0xB0E0E6,
+        shininess: 80,
+      });
 
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 25; i++) {
         const angle = Math.random() * Math.PI * 2;
-        const radius = 0.4 + Math.random() * 2;
+        const radius = Math.random() * 2;
         const droplet = new THREE.Mesh(dropletGeometry, dropletMaterial);
         droplet.position.set(
           Math.cos(angle) * radius,
           Math.sin(angle) * radius,
-          0.3
+          0.25
         );
         droplet.castShadow = true;
         group.add(droplet);
@@ -413,204 +475,204 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
     };
 
     const createAbalonShell = (group: THREE.Group) => {
-      // Layered nacre with iridescence
-      const layers = 8;
+      const layers = 7;
       for (let layer = 0; layer < layers; layer++) {
-        const shellGeometry = new THREE.IcosahedronGeometry(
-          1.6 - layer * 0.18,
-          4
+        const shellGeometry = new THREE.BoxGeometry(
+          2.6 - layer * 0.25,
+          1.9 - layer * 0.22,
+          0.18
         );
-        const t = layer / (layers - 1);
-        const shellColor = new THREE.Color(0xffffff).lerpColors(
-          new THREE.Color(0x4B0082),
-          new THREE.Color(0x00CED1),
-          t
+        const shellColor = new THREE.Color().setHSL(
+          0.6,
+          0.8,
+          0.5 + (layer / layers) * 0.3
         );
-
-        const shellMaterial = createAdvancedMaterial(shellColor.getHex(), 0.7 + t * 0.2, 0.2 - t * 0.1);
+        const shellMaterial = new THREE.MeshPhongMaterial({
+          color: shellColor,
+          shininess: 100 + layer * 10,
+        });
         const shell = new THREE.Mesh(shellGeometry, shellMaterial);
-        shell.position.z = layer * 0.2;
-        shell.rotation.z = (layer * Math.PI) / 16;
+        shell.position.z = layer * 0.22;
+        shell.rotation.z = (layer * Math.PI) / 18;
         shell.castShadow = true;
         group.add(shell);
       }
+
+      const iridGeometry = new THREE.SphereGeometry(1.3, 40, 40);
+      const iridMaterial = new THREE.MeshPhongMaterial({
+        color: 0x00CED1,
+        shininess: 120,
+      });
+      const iridescence = new THREE.Mesh(iridGeometry, iridMaterial);
+      iridescence.scale.set(1, 0.75, 0.1);
+      iridescence.castShadow = true;
+      group.add(iridescence);
     };
 
     const createButterflyWing = (group: THREE.Group) => {
-      const wingGeometry = new THREE.PlaneGeometry(3, 3.5);
-      const wingMaterial = createAdvancedMaterial(0xFF6B9D, 0.3, 0.5);
+      const wingGeometry = new THREE.PlaneGeometry(2.8, 3.4);
+      const wingMaterial = new THREE.MeshPhongMaterial({
+        color: 0xFF6B9D,
+        shininess: 50,
+        side: THREE.DoubleSide,
+      });
       const wing = new THREE.Mesh(wingGeometry, wingMaterial);
       wing.castShadow = true;
       group.add(wing);
 
-      // Detailed iridescent spots
-      const spotGeometry = new THREE.CircleGeometry(0.32, 24);
-      const spotData = [
-        { color: 0xFFD700, pos: [-1, 1.4] },
-        { color: 0xFF4500, pos: [1, 1.4] },
-        { color: 0x4169E1, pos: [-1.4, 0] },
-        { color: 0x32CD32, pos: [1.4, 0] },
-        { color: 0xFF1493, pos: [-0.8, -1.4] },
-        { color: 0x00CED1, pos: [0.8, -1.4] },
+      const spotGeometry = new THREE.CircleGeometry(0.3, 20);
+      const spotColors = [0xFFD700, 0xFF4500, 0x4169E1, 0x32CD32, 0xFF69B4];
+
+      const spotPositions = [
+        [-0.9, 1.3],
+        [0.9, 1.3],
+        [-1.3, 0.2],
+        [1.3, 0.2],
+        [-0.7, -1.3],
+        [0.7, -1.3],
+        [0, 2.0],
+        [0, -2.0],
+        [-1, 0.8],
+        [1, 0.8],
       ];
 
-      spotData.forEach((spot) => {
-        const spotMaterial = createAdvancedMaterial(spot.color, 0.5, 0.35);
-        const marker = new THREE.Mesh(spotGeometry, spotMaterial);
-        marker.position.set(spot.pos[0], spot.pos[1], 0.05);
-        marker.castShadow = true;
-        group.add(marker);
+      spotPositions.forEach((pos, idx) => {
+        const spotMaterial = new THREE.MeshPhongMaterial({
+          color: spotColors[idx % spotColors.length],
+          shininess: 40,
+          side: THREE.DoubleSide,
+        });
+        const spot = new THREE.Mesh(spotGeometry, spotMaterial);
+        spot.position.set(pos[0], pos[1], 0.02);
+        spot.castShadow = true;
+        group.add(spot);
       });
+    };
+
+    const createMothEye = (group: THREE.Group) => {
+      const eyeGeometry = new THREE.SphereGeometry(0.8, 32, 32);
+      const eyeMaterial = new THREE.MeshPhongMaterial({
+        color: 0x1a1a2e,
+        shininess: 30,
+      });
+      const eye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+      eye.castShadow = true;
+      group.add(eye);
+
+      const coneGeometry = new THREE.ConeGeometry(0.08, 0.2, 8);
+      const coneMaterial = new THREE.MeshPhongMaterial({
+        color: 0x2a2a4e,
+        shininess: 20,
+      });
+
+      for (let i = 0; i < 40; i++) {
+        const phi = Math.acos(-1 + (2 * i) / 40);
+        const theta = Math.sqrt(40 * Math.PI) * phi;
+        const x = 0.8 * Math.sin(phi) * Math.cos(theta);
+        const y = 0.8 * Math.sin(phi) * Math.sin(theta);
+        const z = 0.8 * Math.cos(phi);
+
+        const cone = new THREE.Mesh(coneGeometry, coneMaterial);
+        cone.position.set(x, y, z);
+        cone.lookAt(0, 0, 0);
+        cone.castShadow = true;
+        group.add(cone);
+      }
     };
 
     const createSharkSkin = (group: THREE.Group) => {
-      const bodyGeometry = new THREE.ConeGeometry(0.9, 3.5, 20);
-      const bodyMaterial = createAdvancedMaterial(0x4A4A4A, 0.3, 0.65);
-      const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-      body.castShadow = true;
-      body.receiveShadow = true;
-      group.add(body);
+      const skinGeometry = new THREE.PlaneGeometry(4, 2.5, 40, 25);
+      const skinPositions = skinGeometry.attributes.position;
+      const positionArray = skinPositions.array as Float32Array;
 
-      // Riblet pattern
-      const ribletMaterial = new THREE.LineBasicMaterial({
-        color: 0x2A2A2A,
-        linewidth: 1,
+      for (let i = 0; i < positionArray.length; i += 3) {
+        const x = positionArray[i];
+        positionArray[i + 2] = positionArray[i + 2] + Math.sin(x * 10) * 0.1;
+      }
+      skinPositions.needsUpdate = true;
+      skinGeometry.computeVertexNormals();
+
+      const skinMaterial = new THREE.MeshPhongMaterial({
+        color: 0x4A4A4A,
+        shininess: 35,
       });
-      for (let i = 0; i < 24; i++) {
-        const points = [];
-        for (let t = 0; t <= 1; t += 0.1) {
-          const y = -1.75 + t * 3.5;
-          const angle = (i / 24) * Math.PI * 2;
-          const radius = 0.9 * (1 - Math.abs(t - 0.5) * 0.6);
-          points.push(
-            new THREE.Vector3(
-              Math.cos(angle) * radius,
-              y,
-              Math.sin(angle) * radius
-            )
-          );
-        }
-        const geometry = new THREE.BufferGeometry().setFromPoints(points);
-        const line = new THREE.Line(geometry, ribletMaterial);
-        group.add(line);
+      const skin = new THREE.Mesh(skinGeometry, skinMaterial);
+      skin.castShadow = true;
+      group.add(skin);
+    };
+
+    const createBoneModel = (group: THREE.Group) => {
+      const corticalGeometry = new THREE.CylinderGeometry(0.4, 0.4, 3, 32);
+      const corticalMaterial = new THREE.MeshPhongMaterial({
+        color: 0xDCCCC0,
+        shininess: 30,
+      });
+      const cortical = new THREE.Mesh(corticalGeometry, corticalMaterial);
+      cortical.castShadow = true;
+      group.add(cortical);
+
+      const trabecularGeometry = new THREE.CylinderGeometry(0.35, 0.35, 2.8, 32);
+      const trabecularMaterial = new THREE.MeshPhongMaterial({
+        color: 0xE8D7C7,
+        shininess: 20,
+      });
+      const trabecular = new THREE.Mesh(trabecularGeometry, trabecularMaterial);
+      trabecular.castShadow = true;
+      group.add(trabecular);
+
+      for (let i = 0; i < 8; i++) {
+        const ringGeometry = new THREE.TorusGeometry(0.32 - i * 0.02, 0.05, 16, 100);
+        const ringMaterial = new THREE.LineBasicMaterial({
+          color: 0x8B7D6B,
+          linewidth: 1,
+        });
+        const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+        ring.position.z = -1 + i * 0.35;
+        group.add(ring);
       }
     };
 
-    const createPenguin = (group: THREE.Group) => {
-      const bodyGeometry = new THREE.CapsuleGeometry(0.45, 1.8, 8, 16);
-      const bodyMaterial = createAdvancedMaterial(0x000000, 0.2, 0.65);
-      const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-      body.castShadow = true;
-      group.add(body);
+    const createHoneycomb = (group: THREE.Group) => {
+      const cellSize = 0.5;
+      const cells = 5;
 
-      const headGeometry = new THREE.SphereGeometry(0.5, 20, 20);
-      const headMaterial = createAdvancedMaterial(0x1a1a1a, 0.2, 0.65);
-      const head = new THREE.Mesh(headGeometry, headMaterial);
-      head.position.y = 1.3;
-      head.castShadow = true;
-      group.add(head);
+      for (let layer = 0; layer < 3; layer++) {
+        for (let i = 0; i < cells; i++) {
+          for (let j = 0; j < cells; j++) {
+            const x = i * cellSize - (cellSize * cells) / 2;
+            const y =
+              j * cellSize * Math.sqrt(3) / 2 - (cellSize * cells) / 3;
+            const z = layer * cellSize * 0.5;
 
-      const bellyGeometry = new THREE.IcosahedronGeometry(0.42, 4);
-      const bellyMaterial = createAdvancedMaterial(0xFFFFFF, 0.1, 0.75);
-      const belly = new THREE.Mesh(bellyGeometry, bellyMaterial);
-      belly.scale.set(0.75, 0.95, 0.6);
-      belly.position.z = 0.15;
-      belly.castShadow = true;
-      group.add(belly);
-    };
-
-    const createCactus = (group: THREE.Group) => {
-      const bodyGeometry = new THREE.CylinderGeometry(0.7, 0.8, 2.8, 16);
-      const bodyMaterial = createAdvancedMaterial(0x228B22, 0.1, 0.75);
-      const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-      body.castShadow = true;
-      group.add(body);
-
-      for (let i = 0; i < 4; i++) {
-        const angle = (i / 4) * Math.PI * 2;
-        const armGeometry = new THREE.CylinderGeometry(0.35, 0.28, 1.4, 12);
-        const arm = new THREE.Mesh(armGeometry, bodyMaterial);
-        arm.position.set(Math.cos(angle) * 0.8, 0.4, Math.sin(angle) * 0.8);
-        arm.rotation.z = angle;
-        arm.castShadow = true;
-        group.add(arm);
-      }
-
-      const spineGeometry = new THREE.ConeGeometry(0.1, 0.8, 8);
-      const spineMaterial = createAdvancedMaterial(0x8B7355, 0.05, 0.8);
-
-      for (let x = -0.6; x <= 0.6; x += 0.35) {
-        for (let y = -1.4; y <= 1.4; y += 0.45) {
-          const spine = new THREE.Mesh(spineGeometry, spineMaterial);
-          spine.position.set(x, y, 0.75);
-          spine.rotation.z = Math.random() * Math.PI * 2;
-          spine.castShadow = true;
-          group.add(spine);
+            const hexGeometry = new THREE.CylinderGeometry(
+              cellSize * 0.8,
+              cellSize * 0.8,
+              cellSize * 0.6,
+              6
+            );
+            const hexMaterial = new THREE.MeshPhongMaterial({
+              color: 0xFFE680,
+              shininess: 40,
+            });
+            const hex = new THREE.Mesh(hexGeometry, hexMaterial);
+            hex.position.set(x, y, z);
+            hex.castShadow = true;
+            group.add(hex);
+          }
         }
       }
-    };
-
-    const createDolphinHead = (group: THREE.Group) => {
-      const headGeometry = new THREE.IcosahedronGeometry(0.8, 5);
-      const headMaterial = createAdvancedMaterial(0x4A90E2, 0.3, 0.5);
-      const head = new THREE.Mesh(headGeometry, headMaterial);
-      head.castShadow = true;
-      group.add(head);
-
-      const melonGeometry = new THREE.SphereGeometry(0.6, 20, 20);
-      const melonMaterial = createAdvancedMaterial(0x2E5C8A, 0.4, 0.4);
-      const melon = new THREE.Mesh(melonGeometry, melonMaterial);
-      melon.position.z = 0.4;
-      melon.scale.set(1.2, 0.8, 0.6);
-      melon.castShadow = true;
-      group.add(melon);
     };
 
     const createDefaultOrganism = (group: THREE.Group) => {
-      const geometry = new THREE.IcosahedronGeometry(1.6, 6);
-      const material = createAdvancedMaterial(0x2d9e6f, 0.2, 0.4);
+      const geometry = new THREE.IcosahedronGeometry(1.5, 5);
+      const material = new THREE.MeshPhongMaterial({
+        color: 0x2d9e6f,
+        shininess: 45,
+      });
       const mesh = new THREE.Mesh(geometry, material);
       mesh.castShadow = true;
-      mesh.receiveShadow = true;
       group.add(mesh);
     };
-
-    const biomimeticModel = createOrganismModel();
-    modelRef.current = biomimeticModel;
-    scene.add(biomimeticModel);
-
-    // ========== ADVANCED ANIMATION LOOP ==========
-    let animationId: number;
-    let time = 0;
-
-    const animate = () => {
-      animationId = requestAnimationFrame(animate);
-      time += 0.01;
-
-      if (modelRef.current) {
-        modelRef.current.rotation.x += 0.002;
-        modelRef.current.rotation.y += 0.005;
-        modelRef.current.position.y = Math.sin(time * 0.4) * 0.2;
-      }
-
-      renderer.render(scene, camera);
-    };
-
-    animate();
-
-    // ========== RESPONSIVE HANDLING ==========
-    const handleResize = () => {
-      if (!containerRef.current) return;
-
-      const width = containerRef.current.clientWidth;
-      const height = containerRef.current.clientHeight;
-
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-      renderer.setSize(width, height);
-    };
-
-    window.addEventListener("resize", handleResize);
 
     // ========== CLEANUP ==========
     return () => {
@@ -627,9 +689,11 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
   }, [organism, variant]);
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full h-96 bg-gradient-to-b from-blue-50 to-emerald-50 rounded-xl border-2 border-emerald-200 overflow-hidden shadow-xl"
-    />
+    <div className="relative w-full h-96 bg-gradient-to-b from-slate-100 to-slate-50 rounded-lg border border-border overflow-hidden shadow-lg">
+      <div ref={containerRef} className="w-full h-full" />
+      <div className="absolute bottom-2 right-2 text-xs text-muted-foreground bg-white/80 px-2 py-1 rounded">
+        🔄 Rotating | 🎨 High-quality render
+      </div>
+    </div>
   );
 }

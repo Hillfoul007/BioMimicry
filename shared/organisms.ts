@@ -20,33 +20,19 @@ export interface BiologicalSolution {
     description: string;
     specs: string[];
   }>;
+  researchPapers?: string[];
+  realWorldApplications?: string[];
 }
 
 export const problemExamples = [
-  {
-    title: "Passive Building Cooling",
-    description:
-      "Design a building that maintains comfortable temperature without air conditioning",
-    icon: "❄️",
-  },
-  {
-    title: "Ultra-Strong Reusable Adhesive",
-    description:
-      "Create an adhesive that works wet or dry, is reusable, and non-toxic",
-    icon: "🧴",
-  },
-  {
-    title: "Efficient Wind Turbine Blades",
-    description:
-      "Design wind turbine blades that maximize energy capture with minimal noise",
-    icon: "💨",
-  },
-  {
-    title: "Self-Cleaning Waterproof Surface",
-    description:
-      "Create a material that repels water and dirt without chemical coatings",
-    icon: "💧",
-  },
+  { title: "Passive Building Cooling", description: "Design a building that maintains comfortable temperature without air conditioning", icon: "❄️" },
+  { title: "Ultra-Strong Reusable Adhesive", description: "Create an adhesive that works wet or dry, is reusable, and non-toxic", icon: "🧴" },
+  { title: "Efficient Wind Turbine Blades", description: "Design wind turbine blades that maximize energy capture with minimal noise", icon: "💨" },
+  { title: "Self-Cleaning Waterproof Surface", description: "Create a material that repels water and dirt without chemical coatings", icon: "💧" },
+  { title: "Lightweight Strong Structures", description: "Build structures that are strong yet ultra-lightweight like bones and honeycombs", icon: "⚙️" },
+  { title: "Efficient Swimming Propulsion", description: "Design hulls and propellers for underwater vessels with minimal drag", icon: "🏊" },
+  { title: "Silent Flight Systems", description: "Create aerodynamic designs with minimal noise generation", icon: "🦉" },
+  { title: "Energy Harvesting", description: "Capture and store energy efficiently from environment like organisms do", icon: "⚡" },
 ];
 
 // Base organisms with detailed information
