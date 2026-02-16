@@ -88,7 +88,7 @@ export default function Index() {
               How BioMimicry Architect Works
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              From challenge to biomimetic solution in minutes
+              From challenge to biomimetic solution in just 1 minute
             </p>
           </div>
           
