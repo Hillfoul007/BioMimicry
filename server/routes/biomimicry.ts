@@ -1,44 +1,126 @@
 import { RequestHandler } from "express";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { organisms, BiologicalSolution } from "../../shared/organisms";
 
 interface AnalysisResponse {
   challenge: string;
-  solutions: Array<BiologicalSolution & { relevanceScore: number }>;
+  solutions: Array<BiologicalSolution & { relevanceScore: number; aiExplanation: string }>;
   timestamp: number;
 }
 
-// Keyword matching for relevance scoring
-const calculateRelevance = (
-  challenge: string,
-  solution: BiologicalSolution
-): number => {
-  const challengeWords = challenge.toLowerCase().split(/\s+/);
-  let score = Math.random() * 0.3 + 0.6; // Base score between 0.6-0.9
+// Initialize Gemini AI
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
-  // Boost score if challenge keywords match solution tags or description
-  challengeWords.forEach((word) => {
-    if (word.length > 3) {
-      // Skip small words
-      if (solution.tags.some((tag) => tag.includes(word))) {
-        score += 0.1;
-      }
-      if (solution.challenge.toLowerCase().includes(word)) {
-        score += 0.15;
-      }
-      if (solution.mechanism.toLowerCase().includes(word)) {
-        score += 0.08;
-      }
-      if (solution.category.toLowerCase().includes(word)) {
-        score += 0.1;
-      }
+// AI-powered analysis using Gemini
+const analyzeWithGemini = async (
+  challenge: string
+): Promise<Array<BiologicalSolution & { relevanceScore: number; aiExplanation: string }>> => {
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+    // Prepare organism descriptions for the prompt
+    const organismsDesc = organisms
+      .map(
+        (org) =>
+          `${org.organism} (${org.scientificName}): ${org.challenge}. Mechanism: ${org.mechanism}`
+      )
+      .join("\n");
+
+    const prompt = `You are a biomimicry expert. Analyze this engineering challenge and recommend the top 5 most relevant biological solutions from the provided list.
+
+ENGINEERING CHALLENGE:
+"${challenge}"
+
+AVAILABLE BIOLOGICAL SOLUTIONS:
+${organismsDesc}
+
+For each recommended solution, provide:
+1. The organism name
+2. A relevance score from 0.6 to 1.0 (where 1.0 is perfect match)
+3. A brief explanation of why this solution is relevant
+
+Format your response as JSON array:
+[
+  {
+    "organism": "organism_name",
+    "relevanceScore": 0.95,
+    "explanation": "Why this is relevant"
+  }
+]
+
+Only respond with valid JSON array, no additional text.`;
+
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+
+    // Parse JSON response
+    const jsonMatch = text.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) {
+      throw new Error("Invalid response format from Gemini");
     }
-  });
 
-  // Cap at 0.99
-  return Math.min(score, 0.99);
+    const aiRecommendations = JSON.parse(jsonMatch[0]);
+
+    // Map recommendations back to organism data
+    const scoredSolutions = aiRecommendations
+      .map((rec: any) => {
+        const organism = organisms.find(
+          (org) => org.organism.toLowerCase() === rec.organism.toLowerCase()
+        );
+        if (!organism) return null;
+
+        return {
+          ...organism,
+          relevanceScore: Math.min(Math.max(rec.relevanceScore, 0.6), 1.0),
+          aiExplanation: rec.explanation || "",
+        };
+      })
+      .filter((org: any) => org !== null)
+      .slice(0, 5);
+
+    return scoredSolutions;
+  } catch (error) {
+    console.error("Gemini AI analysis error:", error);
+    // Fallback to keyword matching if Gemini fails
+    return fallbackKeywordMatching(challenge);
+  }
 };
 
-export const handleBiomimicryAnalysis: RequestHandler = (req, res) => {
+// Fallback keyword matching
+const fallbackKeywordMatching = (challenge: string): Array<BiologicalSolution & { relevanceScore: number; aiExplanation: string }> => {
+  const challengeWords = challenge.toLowerCase().split(/\s+/);
+
+  return organisms
+    .map((org) => {
+      let score = 0.6;
+      let explanation = "";
+
+      challengeWords.forEach((word) => {
+        if (word.length > 3) {
+          if (org.tags.some((tag) => tag.includes(word))) {
+            score += 0.1;
+          }
+          if (org.challenge.toLowerCase().includes(word)) {
+            score += 0.15;
+            explanation = `Matches challenge: "${word}"`;
+          }
+          if (org.mechanism.toLowerCase().includes(word)) {
+            score += 0.08;
+          }
+        }
+      });
+
+      return {
+        ...org,
+        relevanceScore: Math.min(score, 0.99),
+        aiExplanation: explanation || "Related to your challenge",
+      };
+    })
+    .sort((a, b) => b.relevanceScore - a.relevanceScore)
+    .slice(0, 5);
+};
+
+export const handleBiomimicryAnalysis: RequestHandler = async (req, res) => {
   try {
     const { challenge } = req.body;
 
@@ -49,14 +131,8 @@ export const handleBiomimicryAnalysis: RequestHandler = (req, res) => {
       return;
     }
 
-    // Calculate relevance scores for all organisms
-    const scoredSolutions = organisms
-      .map((org) => ({
-        ...org,
-        relevanceScore: calculateRelevance(challenge, org),
-      }))
-      .sort((a, b) => b.relevanceScore - a.relevanceScore)
-      .slice(0, 5); // Return top 5
+    // Use Gemini AI for intelligent analysis
+    const scoredSolutions = await analyzeWithGemini(challenge);
 
     const response: AnalysisResponse = {
       challenge,

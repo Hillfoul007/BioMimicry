@@ -28,6 +28,7 @@ import { generatePDFReport, downloadSTL, generateShareLink, copyToClipboard } fr
 
 interface Solution extends BiologicalSolution {
   relevanceScore: number;
+  aiExplanation?: string;
 }
 
 interface SimulationResult {
@@ -90,41 +91,38 @@ export default function Architect() {
     setGenerationStep(1);
     setSolutions(null);
 
-    // Simulate AI processing with stages
-    const stages = [1, 2, 3, 4, 5];
-    for (const stage of stages) {
-      await new Promise((resolve) => setTimeout(resolve, 600));
-      setGenerationStep(stage);
+    try {
+      // Show progress stages
+      const stages = [1, 2, 3, 4, 5];
+      for (const stage of stages) {
+        await new Promise((resolve) => setTimeout(resolve, 400));
+        setGenerationStep(stage);
+      }
+
+      // Call AI-powered analysis API
+      const response = await fetch("/api/biomimicry/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          challenge: challenge.trim(),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to analyze challenge");
+      }
+
+      const data = await response.json();
+      setSolutions(data.solutions as Solution[]);
+    } catch (error) {
+      console.error("Analysis error:", error);
+      toast.error("Failed to analyze challenge. Please try again.");
+    } finally {
+      setIsAnalyzing(false);
+      setGenerationStep(0);
     }
-
-    // Calculate relevance based on challenge keywords
-    const challengeWords = challenge.toLowerCase().split(" ");
-    const scoredSolutions = organisms
-      .map((org) => {
-        let score = Math.random() * 0.3 + 0.6;
-        // Boost score if keywords match
-        if (
-          challengeWords.some((word) =>
-            org.challenge.toLowerCase().includes(word)
-          )
-        ) {
-          score += 0.15;
-        }
-        if (
-          challengeWords.some((word) =>
-            org.tags.some((tag) => tag.includes(word))
-          )
-        ) {
-          score += 0.1;
-        }
-        return { ...org, relevanceScore: Math.min(score, 0.99) };
-      })
-      .sort((a, b) => b.relevanceScore - a.relevanceScore)
-      .slice(0, 5);
-
-    setSolutions(scoredSolutions as Solution[]);
-    setIsAnalyzing(false);
-    setGenerationStep(0);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -520,6 +518,16 @@ export default function Architect() {
                   {/* Solution Details */}
                   {expandedId === solution.id && (
                     <div className="border-t border-border px-6 py-5 bg-slate-50 space-y-6">
+                      {/* AI Explanation */}
+                      {solution.aiExplanation && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                          <p className="text-sm font-semibold text-blue-900 mb-1">Why This Solution Matches</p>
+                          <p className="text-sm text-blue-800 leading-relaxed">
+                            {solution.aiExplanation}
+                          </p>
+                        </div>
+                      )}
+
                       {/* Mechanism */}
                       <div>
                         <h4 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
