@@ -1,5 +1,4 @@
 import { RequestHandler } from "express";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { organisms, BiologicalSolution } from "../../shared/organisms";
 
 interface AnalysisResponse {
@@ -8,14 +7,35 @@ interface AnalysisResponse {
   timestamp: number;
 }
 
-// Initialize Gemini AI
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+// Initialize Gemini AI lazily
+let genAI: any = null;
+let geminiInitialized = false;
+
+const initializeGemini = async () => {
+  if (geminiInitialized) return;
+  geminiInitialized = true;
+
+  try {
+    const { GoogleGenerativeAI } = await import("@google/generative-ai");
+    if (process.env.GEMINI_API_KEY) {
+      genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    }
+  } catch (error) {
+    console.warn("Gemini API not available, will use fallback keyword matching", error);
+  }
+}
 
 // AI-powered analysis using Gemini
 const analyzeWithGemini = async (
   challenge: string
 ): Promise<Array<BiologicalSolution & { relevanceScore: number; aiExplanation: string }>> => {
   try {
+    await initializeGemini();
+
+    if (!genAI) {
+      throw new Error("Gemini API not initialized");
+    }
+
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     // Prepare organism descriptions for the prompt
