@@ -76,67 +76,7 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
     modelRef.current = model;
     scene.add(model);
 
-    // Create organism-specific models
-    const createOrganismModel = () => {
-      if (organism?.includes("Termite")) {
-        createTermiteMound(model);
-      } else if (organism?.includes("Gecko")) {
-        createGeckoFeet(model);
-      } else if (organism?.includes("Whale")) {
-        createWhaleBlade(model);
-      } else if (organism?.includes("Lotus")) {
-        createLotusLeaf(model);
-      } else if (organism?.includes("Spider")) {
-        createSpiderWeb(model);
-      } else if (organism?.includes("Abalone")) {
-        createAbalonShell(model);
-      } else if (organism?.includes("Butterfly")) {
-        createButterflyWing(model);
-      } else if (organism?.includes("Moth")) {
-        createMothEye(model);
-      } else if (organism?.includes("Shark")) {
-        createSharkSkin(model);
-      } else if (organism?.includes("Bone")) {
-        createBoneModel(model);
-      } else if (organism?.includes("Honeycomb")) {
-        createHoneycomb(model);
-      } else {
-        createDefaultOrganism(model);
-      }
-    };
-
-    createOrganismModel();
-
-    // Animation loop with smooth rotation and mouse control
-    let animationId: number;
-    const animate = () => {
-      animationId = requestAnimationFrame(animate);
-
-      if (modelRef.current) {
-        modelRef.current.rotation.x += 0.003;
-        modelRef.current.rotation.y += 0.007;
-      }
-
-      renderer.render(scene, camera);
-    };
-
-    animate();
-
-    // Handle window resize
-    const handleResize = () => {
-      if (!containerRef.current) return;
-
-      const width = containerRef.current.clientWidth;
-      const height = containerRef.current.clientHeight;
-
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-      renderer.setSize(width, height);
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    // Helper functions for model creation
+    // Helper functions for model creation (defined first before use)
     const createTermiteMound = (group: THREE.Group) => {
       const spiralCurve = new THREE.CatmullRomCurve3([
         new THREE.Vector3(0, -2.5, 0),
@@ -557,6 +497,66 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
       mesh.castShadow = true;
       group.add(mesh);
     };
+
+    // Create organism-specific models
+    const createOrganismModel = () => {
+      if (organism?.includes("Termite")) {
+        createTermiteMound(model);
+      } else if (organism?.includes("Gecko")) {
+        createGeckoFeet(model);
+      } else if (organism?.includes("Whale")) {
+        createWhaleBlade(model);
+      } else if (organism?.includes("Lotus")) {
+        createLotusLeaf(model);
+      } else if (organism?.includes("Spider")) {
+        createSpiderWeb(model);
+      } else if (organism?.includes("Abalone")) {
+        createAbalonShell(model);
+      } else if (organism?.includes("Butterfly")) {
+        createButterflyWing(model);
+      } else if (organism?.includes("Moth")) {
+        createMothEye(model);
+      } else if (organism?.includes("Shark")) {
+        createSharkSkin(model);
+      } else if (organism?.includes("Bone")) {
+        createBoneModel(model);
+      } else if (organism?.includes("Honeycomb")) {
+        createHoneycomb(model);
+      } else {
+        createDefaultOrganism(model);
+      }
+    };
+
+    createOrganismModel();
+
+    // Animation loop with smooth rotation and mouse control
+    let animationId: number;
+    const animate = () => {
+      animationId = requestAnimationFrame(animate);
+
+      if (modelRef.current) {
+        modelRef.current.rotation.x += 0.003;
+        modelRef.current.rotation.y += 0.007;
+      }
+
+      renderer.render(scene, camera);
+    };
+
+    animate();
+
+    // Handle window resize
+    const handleResize = () => {
+      if (!containerRef.current) return;
+
+      const width = containerRef.current.clientWidth;
+      const height = containerRef.current.clientHeight;
+
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height);
+    };
+
+    window.addEventListener("resize", handleResize);
 
     // Cleanup
     return () => {
