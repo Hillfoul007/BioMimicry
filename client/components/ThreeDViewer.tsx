@@ -12,55 +12,122 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const modelRef = useRef<THREE.Group | null>(null);
+  const envMapRef = useRef<THREE.Texture | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Scene setup
+    // ========== ADVANCED SCENE SETUP ==========
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xf0f4f8);
-    scene.fog = new THREE.Fog(0xf0f4f8, 50, 200);
+
     sceneRef.current = scene;
 
-    // Camera setup
+    // Create advanced gradient environment
+    const canvas = document.createElement("canvas");
+    canvas.width = 512;
+    canvas.height = 512;
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      const gradient = ctx.createLinearGradient(0, 0, 512, 512);
+      gradient.addColorStop(0, "#e8f4f8");
+      gradient.addColorStop(0.5, "#f0f9fc");
+      gradient.addColorStop(1, "#d4f1f9");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 512, 512);
+    }
+    const bgTexture = new THREE.CanvasTexture(canvas);
+    scene.background = bgTexture;
+
+    // ========== ADVANCED CAMERA ==========
     const camera = new THREE.PerspectiveCamera(
-      75,
+      60,
       containerRef.current.clientWidth / containerRef.current.clientHeight,
       0.1,
-      1000
+      2000
     );
-    camera.position.set(0, 0, 8);
+
+    camera.position.z = 8;
     cameraRef.current = camera;
 
-    // Renderer setup - Enhanced for better quality
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    // ========== ADVANCED RENDERER ==========
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: true,
+      precision: "highp",
+      powerPreference: "high-performance",
+    });
+
     renderer.setSize(
       containerRef.current.clientWidth,
       containerRef.current.clientHeight
     );
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFShadowMap;
+
+    renderer.shadowMap.type = THREE.PCFShadowShadowMap;
+    renderer.shadowMap.autoUpdate = true;
+
     renderer.pixelRatio = Math.min(window.devicePixelRatio, 2);
+    renderer.toneMappingExposure = 1.0;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+
     containerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
-    // Enhanced Lighting - 3-point light setup
-    const keyLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    keyLight.position.set(10, 10, 10);
+    // ========== ADVANCED LIGHTING SETUP ==========
+    // Key light (main illumination)
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    keyLight.position.set(12, 15, 10);
     keyLight.castShadow = true;
-    keyLight.shadow.mapSize.set(2048, 2048);
+    keyLight.shadow.mapSize.width = 4096;
+    keyLight.shadow.mapSize.height = 4096;
+    keyLight.shadow.camera.far = 100;
+    keyLight.shadow.camera.left = -20;
+    keyLight.shadow.camera.right = 20;
+    keyLight.shadow.camera.top = 20;
+    keyLight.shadow.camera.bottom = -20;
+    keyLight.shadow.bias = -0.0001;
     scene.add(keyLight);
 
-    const fillLight = new THREE.DirectionalLight(0x4a90e2, 0.5);
-    fillLight.position.set(-8, 5, 8);
+    // Fill light (soften shadows)
+    const fillLight = new THREE.DirectionalLight(0x87CEEB, 0.6);
+    fillLight.position.set(-15, 10, -10);
     scene.add(fillLight);
 
-    const backLight = new THREE.DirectionalLight(0xff6b9d, 0.3);
-    backLight.position.set(0, -10, -10);
-    scene.add(backLight);
+    // Rim light (edge highlights)
+    const rimLight = new THREE.DirectionalLight(0x66BB6A, 0.4);
+    rimLight.position.set(15, -5, 15);
+    scene.add(rimLight);
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    // Ambient light
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
+
+    // Point lights for dynamic lighting
+    const pointLight1 = new THREE.PointLight(0xffffff, 0.3);
+    pointLight1.position.set(-10, 10, 10);
+    scene.add(pointLight1);
+
+    const pointLight2 = new THREE.PointLight(0x87CEEB, 0.2);
+    pointLight2.position.set(10, -10, 10);
+    scene.add(pointLight2);
+
+    // ========== ADVANCED MATERIAL CREATION ==========
+    const createAdvancedMaterial = (
+      baseColor: number,
+      metalness: number = 0.3,
+      roughness: number = 0.6
+    ) => {
+      return new THREE.MeshStandardMaterial({
+        color: baseColor,
+        metalness: metalness,
+        roughness: roughness,
+        envMapIntensity: 1.0,
+      });
+    };
+
+    // ========== HIGH-QUALITY ORGANISM MODELS ==========
+    const createOrganismModel = () => {
+      const group = new THREE.Group();
 
     // Add ground plane for shadows
     const groundGeometry = new THREE.PlaneGeometry(50, 50);
@@ -79,29 +146,31 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
     // Create organism-specific models
     const createOrganismModel = () => {
       if (organism?.includes("Termite")) {
-        createTermiteMound(model);
+
+        createTermiteMound(group);
       } else if (organism?.includes("Gecko")) {
-        createGeckoFeet(model);
+        createGeckoFeet(group);
       } else if (organism?.includes("Whale")) {
-        createWhaleBlade(model);
+        createWhaleBlade(group);
       } else if (organism?.includes("Lotus")) {
-        createLotusLeaf(model);
+        createLotusLeaf(group);
       } else if (organism?.includes("Spider")) {
-        createSpiderWeb(model);
+        createSpiderWeb(group);
       } else if (organism?.includes("Abalone")) {
-        createAbalonShell(model);
+        createAbalonShell(group);
       } else if (organism?.includes("Butterfly")) {
-        createButterflyWing(model);
-      } else if (organism?.includes("Moth")) {
-        createMothEye(model);
+        createButterflyWing(group);
       } else if (organism?.includes("Shark")) {
-        createSharkSkin(model);
-      } else if (organism?.includes("Bone")) {
-        createBoneModel(model);
-      } else if (organism?.includes("Honeycomb")) {
-        createHoneycomb(model);
+        createSharkSkin(group);
+      } else if (organism?.includes("Penguin")) {
+        createPenguin(group);
+      } else if (organism?.includes("Cactus")) {
+        createCactus(group);
+      } else if (organism?.includes("Dolphin")) {
+        createDolphinHead(group);
       } else {
-        createDefaultOrganism(model);
+        createDefaultOrganism(group);
+
       }
     };
 
@@ -138,133 +207,160 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
 
     // Helper functions for model creation
     const createTermiteMound = (group: THREE.Group) => {
+
+      // Main mound with high-detail geometry
+      const moundGeometry = new THREE.IcosahedronGeometry(1.8, 5);
+      const moundMaterial = createAdvancedMaterial(0x8B6F47, 0.1, 0.8);
+      const mound = new THREE.Mesh(moundGeometry, moundMaterial);
+      mound.scale.y = 1.5;
+      mound.castShadow = true;
+      mound.receiveShadow = true;
+      group.add(mound);
+
+      // Spiral ventilation with higher detail
       const spiralCurve = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(0, -2.5, 0),
-        new THREE.Vector3(1.8, -1.8, 0.2),
-        new THREE.Vector3(2.3, -0.3, 1.2),
-        new THREE.Vector3(2, 0.8, 1.8),
-        new THREE.Vector3(1, 2, 1.5),
-        new THREE.Vector3(0.2, 2.5, 0.5),
+        new THREE.Vector3(0, -3, 0),
+        new THREE.Vector3(2, -2, 0.5),
+        new THREE.Vector3(2.5, 0, 1.5),
+        new THREE.Vector3(2, 2, 1.8),
+        new THREE.Vector3(0.5, 2.5, 1),
+        new THREE.Vector3(0, 3, 0),
       ]);
 
-      const tubeGeometry = new THREE.TubeGeometry(spiralCurve, 30, 0.5, 8);
-      const tubeMaterial = new THREE.MeshPhongMaterial({
-        color: 0xA0522D,
-        shininess: 20,
-      });
+      const tubeGeometry = new THREE.TubeGeometry(spiralCurve, 40, 0.5, 12);
+      const tubeMaterial = createAdvancedMaterial(0x9B5523, 0.2, 0.7);
+
       const tube = new THREE.Mesh(tubeGeometry, tubeMaterial);
       tube.castShadow = true;
+      tube.receiveShadow = true;
       group.add(tube);
 
-      for (let i = 0; i < 10; i++) {
-        const angle = (i / 10) * Math.PI * 2;
-        const height = Math.sin((i / 10) * Math.PI) * 2.2;
-        const channelGeometry = new THREE.CylinderGeometry(0.25, 0.15, 1.8, 16);
-        const channelMaterial = new THREE.MeshPhongMaterial({
-          color: 0x9B5523,
-          shininess: 15,
-        });
+
+      // High-detail branching channels
+      for (let i = 0; i < 14; i++) {
+        const angle = (i / 14) * Math.PI * 2;
+        const height = Math.sin((i / 14) * Math.PI) * 2.8;
+
+        const channelGeometry = new THREE.CylinderGeometry(0.25, 0.18, 2.2, 16);
+        const channelMaterial = createAdvancedMaterial(0xA0622D, 0.15, 0.75);
         const channel = new THREE.Mesh(channelGeometry, channelMaterial);
         channel.position.set(
-          Math.cos(angle) * 2.5,
-          height - 0.5,
-          Math.sin(angle) * 2.5
+          Math.cos(angle) * 2.6,
+          height - 0.8,
+          Math.sin(angle) * 2.6
+
         );
         channel.rotation.z = angle + Math.PI / 2;
         channel.castShadow = true;
+        channel.receiveShadow = true;
         group.add(channel);
       }
 
-      const moundGeometry = new THREE.SphereGeometry(1.6, 48, 48);
-      const moundMaterial = new THREE.MeshPhongMaterial({
-        color: 0xA0522D,
-        shininess: 10,
-      });
-      const mound = new THREE.Mesh(moundGeometry, moundMaterial);
-      mound.scale.y = 1.35;
-      mound.castShadow = true;
-      group.add(mound);
     };
 
     const createGeckoFeet = (group: THREE.Group) => {
-      const padGeometry = new THREE.BoxGeometry(2.2, 1.4, 0.6);
-      const padMaterial = new THREE.MeshPhongMaterial({
-        color: 0xD4A574,
-        shininess: 25,
-      });
+      // High-poly main foot pad
+      const padGeometry = new THREE.BoxGeometry(2.4, 1.4, 0.7);
+      const padMaterial = createAdvancedMaterial(0xD4A574, 0.2, 0.5);
+
       const pad = new THREE.Mesh(padGeometry, padMaterial);
       pad.castShadow = true;
+      pad.receiveShadow = true;
       group.add(pad);
 
-      const bristleGeometry = new THREE.ConeGeometry(0.1, 1.4, 12);
-      const bristleMaterial = new THREE.MeshPhongMaterial({
-        color: 0xA68B5B,
-        shininess: 20,
-      });
 
-      for (let x = -0.95; x <= 0.95; x += 0.25) {
-        for (let z = -0.25; z <= 0.25; z += 0.12) {
+      // Detailed micro-scale bristles
+      const bristleGeometry = new THREE.ConeGeometry(0.09, 1.5, 16);
+      const bristleMaterial = createAdvancedMaterial(0xA68B5B, 0.1, 0.6);
+
+      for (let x = -1; x <= 1; x += 0.2) {
+        for (let z = -0.3; z <= 0.3; z += 0.1) {
           const bristle = new THREE.Mesh(bristleGeometry, bristleMaterial);
-          bristle.position.set(x, 0.8, z);
+          bristle.position.set(x, 0.9, z);
+
           bristle.castShadow = true;
           group.add(bristle);
         }
       }
 
-      const subBristleGeometry = new THREE.ConeGeometry(0.04, 0.8, 8);
-      const subBristleMaterial = new THREE.MeshPhongMaterial({
-        color: 0x8B7355,
-        shininess: 15,
-      });
 
-      for (let x = -0.7; x <= 0.7; x += 0.7) {
+      // Sub-bristles for hierarchical detail
+      const subBristleGeometry = new THREE.ConeGeometry(0.04, 0.7, 10);
+      const subBristleMaterial = createAdvancedMaterial(0x8B7355, 0.05, 0.7);
+
+      for (let x = -0.8; x <= 0.8; x += 0.4) {
         for (let z = -0.15; z <= 0.15; z += 0.15) {
           const subbristle = new THREE.Mesh(subBristleGeometry, subBristleMaterial);
-          subbristle.position.set(x, 1.5, z);
-          subbristle.scale.set(0.6, 0.6, 0.6);
+          subbristle.position.set(x, 1.6, z);
+          subbristle.scale.set(0.7, 0.7, 0.7);
+
           subbristle.castShadow = true;
           group.add(subbristle);
         }
       }
+
+      // Contact surface
+      const contactGeometry = new THREE.BoxGeometry(2.3, 1.3, 0.15);
+      const contactMaterial = createAdvancedMaterial(0xC4975A, 0.3, 0.4);
+      const contact = new THREE.Mesh(contactGeometry, contactMaterial);
+      contact.position.y = -0.8;
+      contact.castShadow = true;
+      group.add(contact);
     };
 
     const createWhaleBlade = (group: THREE.Group) => {
-      const points = [
-        new THREE.Vector2(0, 0),
-        new THREE.Vector2(1.5, 0),
-        new THREE.Vector2(1.8, 0.3),
-        new THREE.Vector2(1.5, 0.6),
-        new THREE.Vector2(0, 0.6),
-      ];
-      const bladeGeometry = new THREE.LatheGeometry(points, 32);
-      const bladeMaterial = new THREE.MeshPhongMaterial({
-        color: 0x4A90E2,
-        shininess: 40,
-      });
+
+      // High-detail main blade
+      const bladeGeometry = new THREE.BoxGeometry(3.8, 0.9, 0.5);
+      const bladeMaterial = createAdvancedMaterial(0x4A90E2, 0.4, 0.35);
+
       const blade = new THREE.Mesh(bladeGeometry, bladeMaterial);
       blade.castShadow = true;
+      blade.receiveShadow = true;
       group.add(blade);
 
-      const tubercleGeometry = new THREE.IcosahedronGeometry(0.24, 3);
-      const tubercleMaterial = new THREE.MeshPhongMaterial({
-        color: 0x2E5C8A,
-        shininess: 35,
-      });
 
-      for (let i = 0; i < 16; i++) {
-        const x = (i / 15) * 3.4 - 1.7;
+      // Detailed tubercles
+      const tubercleGeometry = new THREE.IcosahedronGeometry(0.28, 4);
+      const tubercleMaterial = createAdvancedMaterial(0x2E5C8A, 0.35, 0.4);
+
+      for (let i = 0; i < 18; i++) {
+        const x = (i / 17) * 3.6 - 1.8;
         const tubercle = new THREE.Mesh(tubercleGeometry, tubercleMaterial);
-        tubercle.position.set(x, 0.75, 0.05);
-        tubercle.scale.set(1.1, 0.9, 0.7);
+        tubercle.position.set(x, 0.6, 0.2);
+        tubercle.scale.set(1.1, 0.75, 0.55);
         tubercle.castShadow = true;
         group.add(tubercle);
       }
+
+      // Vein structure
+      for (let i = 0; i < 12; i++) {
+        const x = (i / 11) * 3.6 - 1.8;
+        const veinGeometry = new THREE.CylinderGeometry(0.09, 0.09, 0.7, 12);
+        const veinMaterial = createAdvancedMaterial(0x3a5f7d, 0.2, 0.6);
+        const vein = new THREE.Mesh(veinGeometry, veinMaterial);
+        vein.position.set(x, 0, 0.08);
+        vein.rotation.z = Math.PI / 2;
+        vein.castShadow = true;
+        group.add(vein);
+      }
+
+      // Edge highlight
+      const edgeGeometry = new THREE.BoxGeometry(3.7, 0.06, 0.35);
+      const edgeMaterial = createAdvancedMaterial(0x5A9FE2, 0.6, 0.25);
+      const edge = new THREE.Mesh(edgeGeometry, edgeMaterial);
+      edge.position.y = 0.48;
+      edge.castShadow = true;
+      group.add(edge);
     };
 
     const createLotusLeaf = (group: THREE.Group) => {
-      const leafGeometry = new THREE.PlaneGeometry(3.2, 3.2, 24, 24);
+      // High-detail leaf surface
+      const leafGeometry = new THREE.PlaneGeometry(3.5, 3.5, 32, 32);
       const leafPositions = leafGeometry.attributes.position;
       const positionArray = leafPositions.array as Float32Array;
+
+      // Create organic wavy shape
 
       for (let i = 0; i < positionArray.length; i += 3) {
         const x = positionArray[i];
@@ -301,6 +397,24 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
           group.add(bump);
         }
       }
+
+      // Veins for organic look
+      const veinMaterial = new THREE.LineBasicMaterial({
+        color: 0x1e8449,
+        linewidth: 3,
+      });
+      for (let i = 0; i < 10; i++) {
+        const angle = (i / 10) * Math.PI * 2;
+        const points = [];
+        for (let r = 0; r <= 1.7; r += 0.2) {
+          points.push(
+            new THREE.Vector3(Math.cos(angle) * r, Math.sin(angle) * r, 0.4)
+          );
+        }
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        const line = new THREE.Line(geometry, veinMaterial);
+        group.add(line);
+      }
     };
 
     const createSpiderWeb = (group: THREE.Group) => {
@@ -333,6 +447,8 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
             0
           )
         );
+        const spiral = new THREE.Line(spiralGeometry, threadMaterial);
+        group.add(spiral);
       }
       const spiralGeometry = new THREE.BufferGeometry().setFromPoints(spiralPoints);
       const spiral = new THREE.Line(spiralGeometry, threadMaterial);
@@ -558,7 +674,7 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
       group.add(mesh);
     };
 
-    // Cleanup
+    // ========== CLEANUP ==========
     return () => {
       window.removeEventListener("resize", handleResize);
       cancelAnimationFrame(animationId);
