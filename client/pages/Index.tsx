@@ -48,12 +48,27 @@ export default function Index() {
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-2xl blur-3xl" />
               <div className="relative bg-white rounded-2xl border border-border p-8 shadow-lg">
-                <div className="mb-6 animate-float h-96 rounded-lg overflow-hidden bg-gradient-to-br from-emerald-100 to-cyan-100">
-                  <img
-                    src="https://images.unsplash.com/photo-1579783902614-e3fb5141b0cb?w=500&h=500&fit=crop&q=80"
-                    alt="3D Bio-inspired Design"
-                    className="w-full h-full object-cover"
-                  />
+                <div className="mb-6 animate-float h-96 rounded-lg overflow-hidden bg-gradient-to-br from-emerald-400 via-cyan-300 to-blue-500 flex items-center justify-center relative">
+                  <div className="absolute inset-0 opacity-30">
+                    <svg viewBox="0 0 400 400" className="w-full h-full">
+                      <defs>
+                        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" style={{stopColor: '#fff', stopOpacity: 0.2}} />
+                          <stop offset="100%" style={{stopColor: '#000', stopOpacity: 0.1}} />
+                        </linearGradient>
+                      </defs>
+                      <circle cx="200" cy="200" r="150" fill="url(#grad1)" />
+                      <path d="M 200 50 L 320 280 L 200 300 L 80 280 Z" fill="rgba(255,255,255,0.15)" />
+                      <circle cx="200" cy="200" r="100" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2" />
+                      <circle cx="200" cy="200" r="70" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
+                    </svg>
+                  </div>
+                  <div className="relative z-10 text-center">
+                    <div className="w-32 h-32 mx-auto mb-4 bg-white/20 backdrop-blur rounded-full flex items-center justify-center">
+                      <Leaf className="w-16 h-16 text-white/80" />
+                    </div>
+                    <p className="text-white font-semibold text-sm">3D Design Preview</p>
+                  </div>
                 </div>
                 <h3 className="font-bold text-lg text-foreground mb-2">AI-Powered Solutions</h3>
                 <p className="text-sm text-muted-foreground">
