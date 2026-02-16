@@ -25,29 +25,44 @@ const analyzeWithGemini = async (
       )
       .join("\n");
 
-    const prompt = `You are a biomimicry expert. Analyze this engineering challenge and recommend the top 5 most relevant biological solutions from the provided list.
+    const prompt = `You are an expert biomimicry consultant with deep knowledge of biological engineering solutions. Your task is to analyze an engineering challenge and match it with the most relevant biological solutions.
 
-ENGINEERING CHALLENGE:
+CRITICAL INSTRUCTIONS:
+- Analyze the CORE PROBLEM in the challenge, not just keywords
+- Score based on how well the biological solution SOLVES the actual problem
+- Higher scores (0.85-1.0) for solutions that directly address the core challenge
+- Provide SPECIFIC, TECHNICAL explanations of why each solution matches
+- Focus on mechanism match, not just superficial similarity
+
+ENGINEERING CHALLENGE TO SOLVE:
 "${challenge}"
 
 AVAILABLE BIOLOGICAL SOLUTIONS:
 ${organismsDesc}
 
-For each recommended solution, provide:
-1. The organism name
-2. A relevance score from 0.6 to 1.0 (where 1.0 is perfect match)
-3. A brief explanation of why this solution is relevant
+ANALYSIS TASK:
+1. Identify the core engineering problem (what needs to be achieved/solved)
+2. For each biological solution, evaluate:
+   - How well the biological mechanism solves the core problem
+   - Transferability of the solution to engineering
+   - Performance improvements over traditional approaches
+   - Feasibility of implementation
+3. Rank the top 5 most relevant solutions
 
-Format your response as JSON array:
+RESPONSE FORMAT - Return ONLY a valid JSON array with no additional text:
 [
   {
-    "organism": "organism_name",
-    "relevanceScore": 0.95,
-    "explanation": "Why this is relevant"
+    "organism": "organism_name_exactly_as_listed",
+    "relevanceScore": 0.92,
+    "explanation": "Specific technical reason why this solution directly solves the challenge. Include how the organism's mechanism works and why it's relevant."
   }
 ]
 
-Only respond with valid JSON array, no additional text.`;
+QUALITY CRITERIA:
+- Be precise and technical in explanations
+- Scores should reflect true relevance (0.6-1.0 range)
+- Explain the mechanism connection to the challenge
+- Higher scores for better problem-matches`;
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,

@@ -419,41 +419,6 @@ export default function Architect() {
           {/* Solutions Section */}
           {solutions && (
             <div className="space-y-6 animate-slide-up">
-              {/* Query & Upload Summary */}
-              <div className="bg-white rounded-2xl border border-border p-8 shadow-lg">
-                <h2 className="text-2xl font-bold text-foreground mb-6">Your Challenge</h2>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {/* Challenge Text */}
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-semibold text-foreground mb-3">
-                      Challenge Description
-                    </label>
-                    <div className="bg-slate-50 rounded-lg border border-border p-4">
-                      <p className="text-foreground leading-relaxed whitespace-pre-wrap">
-                        {challenge}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Uploaded File Preview */}
-                  {file && (
-                    <div>
-                      <label className="block text-sm font-semibold text-foreground mb-3">
-                        Uploaded File
-                      </label>
-                      <div className="bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg border border-border p-4 h-full flex flex-col items-center justify-center text-center">
-                        <Upload className="w-8 h-8 text-primary mb-2" />
-                        <p className="text-sm font-medium text-foreground">{file.name}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {(file.size / 1024).toFixed(2)} KB
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
               {/* Solutions Header */}
               <div className="flex items-center justify-between">
                 <div>
