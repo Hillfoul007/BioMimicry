@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import { ArrowRight, Leaf, Zap, Microscope } from "lucide-react";
+import ThreeDViewer from "@/components/ThreeDViewer";
 
 export default function Index() {
   return (
@@ -48,11 +49,8 @@ export default function Index() {
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-2xl blur-3xl" />
               <div className="relative bg-white rounded-2xl border border-border p-8 shadow-lg">
-                <div className="aspect-square bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl flex items-center justify-center mb-6 animate-float">
-                  <div className="text-center">
-                    <Leaf className="w-16 h-16 text-primary mx-auto mb-3" />
-                    <p className="text-sm font-semibold text-primary">Nature Inspired</p>
-                  </div>
+                <div className="mb-6 animate-float">
+                  <ThreeDViewer organism="Lotus" variant="default" />
                 </div>
                 <h3 className="font-bold text-lg text-foreground mb-2">AI-Powered Solutions</h3>
                 <p className="text-sm text-muted-foreground">
