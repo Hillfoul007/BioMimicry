@@ -50,7 +50,7 @@ export default function Index() {
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-2xl blur-3xl" />
               <div className="relative bg-white rounded-2xl border border-border p-8 shadow-lg">
                 <div className="mb-6 animate-float">
-                  <ThreeDViewer organism="Lotus" variant="default" />
+                  <ThreeDViewer organism="Abalone" variant="default" />
                 </div>
                 <h3 className="font-bold text-lg text-foreground mb-2">AI-Powered Solutions</h3>
                 <p className="text-sm text-muted-foreground">

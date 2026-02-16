@@ -300,38 +300,43 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
     };
 
     const createAbalonShell = (group: THREE.Group) => {
-      const layers = 7;
+      const layers = 9;
+      const hueVariations = [0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9];
+
       for (let layer = 0; layer < layers; layer++) {
         const shellGeometry = new THREE.BoxGeometry(
-          2.6 - layer * 0.25,
-          1.9 - layer * 0.22,
-          0.18
+          2.8 - layer * 0.28,
+          2.1 - layer * 0.24,
+          0.15
         );
         const shellColor = new THREE.Color().setHSL(
-          0.6,
-          0.8,
-          0.5 + (layer / layers) * 0.3
+          hueVariations[layer],
+          0.85,
+          0.48 + (layer / layers) * 0.35
         );
         const shellMaterial = new THREE.MeshStandardMaterial({
           color: shellColor,
-          roughness: 0.3,
-          metalness: 0.4,
+          roughness: 0.25,
+          metalness: 0.5,
         });
         const shell = new THREE.Mesh(shellGeometry, shellMaterial);
-        shell.position.z = layer * 0.22;
-        shell.rotation.z = (layer * Math.PI) / 18;
+        shell.position.z = layer * 0.2;
+        shell.rotation.z = (layer * Math.PI) / 16;
         shell.castShadow = true;
         group.add(shell);
       }
 
-      const iridGeometry = new THREE.SphereGeometry(1.3, 40, 40);
+      // Add inner iridescent glow
+      const iridGeometry = new THREE.SphereGeometry(1.4, 32, 32);
       const iridMaterial = new THREE.MeshStandardMaterial({
-        color: 0x00D9D9,
-        roughness: 0.2,
-        metalness: 0.6,
+        color: 0x00E5FF,
+        roughness: 0.15,
+        metalness: 0.7,
+        emissive: 0x00B8CC,
+        emissiveIntensity: 0.2,
       });
       const iridescence = new THREE.Mesh(iridGeometry, iridMaterial);
-      iridescence.scale.set(1, 0.75, 0.1);
+      iridescence.scale.set(1, 0.8, 0.08);
       iridescence.castShadow = true;
       group.add(iridescence);
     };
