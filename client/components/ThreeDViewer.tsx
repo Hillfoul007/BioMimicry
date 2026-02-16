@@ -33,33 +33,42 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
     cameraRef.current = camera;
 
     // Renderer setup - Enhanced for better quality
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
     renderer.setSize(
       containerRef.current.clientWidth,
       containerRef.current.clientHeight
     );
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFShadowMap;
+    renderer.shadowMap.mapSize.set(4096, 4096);
     renderer.pixelRatio = Math.min(window.devicePixelRatio, 2);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.2;
     containerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
-    // Enhanced Lighting - 3-point light setup
-    const keyLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    keyLight.position.set(10, 10, 10);
+    // Enhanced Lighting - Professional 3-point light setup
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.0);
+    keyLight.position.set(12, 12, 12);
     keyLight.castShadow = true;
-    keyLight.shadow.mapSize.set(2048, 2048);
+    keyLight.shadow.mapSize.set(4096, 4096);
+    keyLight.shadow.camera.far = 50;
+    keyLight.shadow.camera.left = -20;
+    keyLight.shadow.camera.right = 20;
+    keyLight.shadow.camera.top = 20;
+    keyLight.shadow.camera.bottom = -20;
     scene.add(keyLight);
 
-    const fillLight = new THREE.DirectionalLight(0x4a90e2, 0.5);
-    fillLight.position.set(-8, 5, 8);
+    const fillLight = new THREE.DirectionalLight(0x4a90e2, 0.6);
+    fillLight.position.set(-10, 8, 10);
     scene.add(fillLight);
 
-    const backLight = new THREE.DirectionalLight(0xff6b9d, 0.3);
-    backLight.position.set(0, -10, -10);
-    scene.add(backLight);
+    const rimLight = new THREE.DirectionalLight(0xff6b9d, 0.4);
+    rimLight.position.set(0, -12, -12);
+    scene.add(rimLight);
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
     scene.add(ambientLight);
 
     // Add ground plane for shadows
@@ -219,18 +228,20 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
       leafPositions.needsUpdate = true;
       leafGeometry.computeVertexNormals();
 
-      const leafMaterial = new THREE.MeshPhongMaterial({
-        color: 0x2ECC71,
-        shininess: 60,
+      const leafMaterial = new THREE.MeshStandardMaterial({
+        color: 0x22C55E,
+        roughness: 0.4,
+        metalness: 0.1,
       });
       const leaf = new THREE.Mesh(leafGeometry, leafMaterial);
       leaf.castShadow = true;
       group.add(leaf);
 
       const bumpGeometry = new THREE.SphereGeometry(0.18, 16, 16);
-      const bumpMaterial = new THREE.MeshPhongMaterial({
-        color: 0x27AE60,
-        shininess: 50,
+      const bumpMaterial = new THREE.MeshStandardMaterial({
+        color: 0x16A34A,
+        roughness: 0.3,
+        metalness: 0.05,
       });
 
       for (let x = -1.5; x <= 1.5; x += 0.7) {
@@ -311,9 +322,10 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
           0.8,
           0.5 + (layer / layers) * 0.3
         );
-        const shellMaterial = new THREE.MeshPhongMaterial({
+        const shellMaterial = new THREE.MeshStandardMaterial({
           color: shellColor,
-          shininess: 100 + layer * 10,
+          roughness: 0.3,
+          metalness: 0.4,
         });
         const shell = new THREE.Mesh(shellGeometry, shellMaterial);
         shell.position.z = layer * 0.22;
@@ -323,9 +335,10 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
       }
 
       const iridGeometry = new THREE.SphereGeometry(1.3, 40, 40);
-      const iridMaterial = new THREE.MeshPhongMaterial({
-        color: 0x00CED1,
-        shininess: 120,
+      const iridMaterial = new THREE.MeshStandardMaterial({
+        color: 0x00D9D9,
+        roughness: 0.2,
+        metalness: 0.6,
       });
       const iridescence = new THREE.Mesh(iridGeometry, iridMaterial);
       iridescence.scale.set(1, 0.75, 0.1);
@@ -335,9 +348,10 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
 
     const createButterflyWing = (group: THREE.Group) => {
       const wingGeometry = new THREE.PlaneGeometry(2.8, 3.4);
-      const wingMaterial = new THREE.MeshPhongMaterial({
+      const wingMaterial = new THREE.MeshStandardMaterial({
         color: 0xFF6B9D,
-        shininess: 50,
+        roughness: 0.35,
+        metalness: 0.15,
         side: THREE.DoubleSide,
       });
       const wing = new THREE.Mesh(wingGeometry, wingMaterial);
@@ -361,9 +375,10 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
       ];
 
       spotPositions.forEach((pos, idx) => {
-        const spotMaterial = new THREE.MeshPhongMaterial({
+        const spotMaterial = new THREE.MeshStandardMaterial({
           color: spotColors[idx % spotColors.length],
-          shininess: 40,
+          roughness: 0.3,
+          metalness: 0.1,
           side: THREE.DoubleSide,
         });
         const spot = new THREE.Mesh(spotGeometry, spotMaterial);
@@ -489,9 +504,10 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
 
     const createDefaultOrganism = (group: THREE.Group) => {
       const geometry = new THREE.IcosahedronGeometry(1.5, 5);
-      const material = new THREE.MeshPhongMaterial({
-        color: 0x2d9e6f,
-        shininess: 45,
+      const material = new THREE.MeshStandardMaterial({
+        color: 0x059669,
+        roughness: 0.4,
+        metalness: 0.2,
       });
       const mesh = new THREE.Mesh(geometry, material);
       mesh.castShadow = true;
@@ -535,8 +551,8 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
       animationId = requestAnimationFrame(animate);
 
       if (modelRef.current) {
-        modelRef.current.rotation.x += 0.003;
-        modelRef.current.rotation.y += 0.007;
+        modelRef.current.rotation.x += 0.0015;
+        modelRef.current.rotation.y += 0.005;
       }
 
       renderer.render(scene, camera);
@@ -575,8 +591,8 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
   return (
     <div className="relative w-full h-96 bg-gradient-to-b from-slate-100 to-slate-50 rounded-lg border border-border overflow-hidden shadow-lg">
       <div ref={containerRef} className="w-full h-full" />
-      <div className="absolute bottom-2 right-2 text-xs text-muted-foreground bg-white/80 px-2 py-1 rounded">
-        🔄 Rotating | 🎨 High-quality render
+      <div className="absolute bottom-2 right-2 text-xs text-muted-foreground bg-white/90 backdrop-blur px-3 py-1.5 rounded-full font-medium">
+        3D Rendering • Interactive
       </div>
     </div>
   );
