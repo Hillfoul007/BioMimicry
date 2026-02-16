@@ -7,36 +7,15 @@ interface AnalysisResponse {
   timestamp: number;
 }
 
-// Initialize Gemini AI lazily
-let genAI: any = null;
-let geminiInitialized = false;
-
-const initializeGemini = async () => {
-  if (geminiInitialized) return;
-  geminiInitialized = true;
-
-  try {
-    const { GoogleGenerativeAI } = await import("@google/generative-ai");
-    if (process.env.GEMINI_API_KEY) {
-      genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    }
-  } catch (error) {
-    console.warn("Gemini API not available, will use fallback keyword matching", error);
-  }
-}
-
-// AI-powered analysis using Gemini
+// AI-powered analysis using Gemini REST API
 const analyzeWithGemini = async (
   challenge: string
 ): Promise<Array<BiologicalSolution & { relevanceScore: number; aiExplanation: string }>> => {
   try {
-    await initializeGemini();
-
-    if (!genAI) {
-      throw new Error("Gemini API not initialized");
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error("Gemini API key not configured");
     }
-
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     // Prepare organism descriptions for the prompt
     const organismsDesc = organisms
@@ -70,8 +49,35 @@ Format your response as JSON array:
 
 Only respond with valid JSON array, no additional text.`;
 
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: prompt,
+                },
+              ],
+            },
+          ],
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Gemini API error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const text =
+      data.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "";
 
     // Parse JSON response
     const jsonMatch = text.match(/\[[\s\S]*\]/);

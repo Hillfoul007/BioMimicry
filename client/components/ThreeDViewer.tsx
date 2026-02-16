@@ -45,7 +45,7 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
       containerRef.current.clientHeight
     );
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFShadowShadowMap;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
     renderer.pixelRatio = window.devicePixelRatio;
     renderer.sortObjects = true;
     containerRef.current.appendChild(renderer.domElement);
