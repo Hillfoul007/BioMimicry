@@ -40,11 +40,7 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
     );
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFShadowMap;
-    renderer.shadowMap.mapSize.set(4096, 4096);
     renderer.pixelRatio = Math.min(window.devicePixelRatio, 2);
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
     containerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
@@ -52,12 +48,6 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
     const keyLight = new THREE.DirectionalLight(0xffffff, 1.0);
     keyLight.position.set(12, 12, 12);
     keyLight.castShadow = true;
-    keyLight.shadow.mapSize.set(4096, 4096);
-    keyLight.shadow.camera.far = 50;
-    keyLight.shadow.camera.left = -20;
-    keyLight.shadow.camera.right = 20;
-    keyLight.shadow.camera.top = 20;
-    keyLight.shadow.camera.bottom = -20;
     scene.add(keyLight);
 
     const fillLight = new THREE.DirectionalLight(0x4a90e2, 0.6);
