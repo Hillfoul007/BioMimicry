@@ -1,5 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { useSketchfabModels } from "@/hooks/use-sketchfab";
 
 interface ThreeDViewerProps {
   variant?: string;
@@ -12,6 +14,9 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const modelRef = useRef<THREE.Group | null>(null);
+  const [modelLoaded, setModelLoaded] = useState(false);
+
+  const { models, loading: modelsLoading, selectedModel } = useSketchfabModels(organism);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -618,7 +623,59 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
       group.add(mesh);
     };
 
-    // Create organism-specific models
+    // Try to load model from Sketchfab, fallback to procedural
+    const loadOrganismModel = async () => {
+      if (!model) return;
+
+      // Try Sketchfab first if model is available
+      if (selectedModel) {
+        try {
+          // Get the model download URL
+          const downloadResponse = await fetch(
+            `/api/sketchfab/download/${selectedModel.uid}`
+          );
+          const downloadData = await downloadResponse.json();
+
+          if (downloadData.glbUrl) {
+            // Load GLB from Sketchfab
+            const loader = new GLTFLoader();
+            loader.load(
+              downloadData.glbUrl,
+              (gltf) => {
+                const sketchfabModel = gltf.scene;
+
+                // Scale and position the model
+                sketchfabModel.scale.set(3, 3, 3);
+                sketchfabModel.traverse((node) => {
+                  if (node instanceof THREE.Mesh) {
+                    node.castShadow = true;
+                    node.receiveShadow = true;
+                  }
+                });
+
+                model.add(sketchfabModel);
+                setModelLoaded(true);
+                return;
+              },
+              undefined,
+              (error) => {
+                console.warn("Failed to load Sketchfab model, using fallback:", error);
+                createOrganismModel();
+              }
+            );
+          } else {
+            createOrganismModel();
+          }
+        } catch (error) {
+          console.warn("Sketchfab load error, using fallback:", error);
+          createOrganismModel();
+        }
+      } else {
+        createOrganismModel();
+      }
+    };
+
+    // Create organism-specific models (procedural fallback)
     const createOrganismModel = () => {
       if (organism?.includes("Termite")) {
         createTermiteMound(model);
@@ -647,7 +704,7 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
       }
     };
 
-    createOrganismModel();
+    loadOrganismModel();
 
     // Animation loop with smooth rotation
     let animationId: number;
@@ -693,13 +750,23 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
       }
       renderer.dispose();
     };
-  }, [organism, variant]);
+  }, [organism, variant, selectedModel]);
 
   return (
     <div className="relative w-full h-96 bg-gradient-to-b from-slate-100 to-slate-50 rounded-lg border border-border overflow-hidden shadow-lg">
       <div ref={containerRef} className="w-full h-full" />
+
+      {modelsLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur">
+          <div className="flex flex-col items-center gap-2">
+            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm text-muted-foreground">Loading Sketchfab model...</p>
+          </div>
+        </div>
+      )}
+
       <div className="absolute bottom-2 right-2 text-xs text-muted-foreground bg-white/90 backdrop-blur px-3 py-1.5 rounded-full font-medium">
-        3D Rendering • Interactive
+        {modelLoaded ? "3D Model • Sketchfab" : "3D Rendering • Interactive"}
       </div>
     </div>
   );
