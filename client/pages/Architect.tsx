@@ -419,6 +419,16 @@ export default function Architect() {
           {/* Solutions Section */}
           {solutions && (
             <div className="space-y-6 animate-slide-up">
+              {/* Query Display */}
+              <div className="bg-gradient-to-r from-primary/5 to-secondary/5 border border-primary/20 rounded-xl p-6">
+                <p className="text-xs uppercase tracking-wide font-semibold text-primary mb-2">
+                  Your Challenge
+                </p>
+                <p className="text-lg font-medium text-foreground leading-relaxed">
+                  {challenge}
+                </p>
+              </div>
+
               {/* Solutions Header */}
               <div className="flex items-center justify-between">
                 <div>

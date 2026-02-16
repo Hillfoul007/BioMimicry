@@ -8,6 +8,11 @@ import {
   handleGetOrganisms,
   handleGetOrganism,
 } from "./routes/biomimicry";
+import {
+  handleSketchfabSearch,
+  handleSketchfabDownload,
+  handleSketchfabViewer,
+} from "./routes/sketchfab";
 
 export function createServer() {
   const app = express();
@@ -30,6 +35,11 @@ export function createServer() {
   app.get("/api/organisms/search", handleOrganismSearch);
   app.get("/api/organisms", handleGetOrganisms);
   app.get("/api/organisms/:id", handleGetOrganism);
+
+  // Sketchfab 3D Model Integration
+  app.get("/api/sketchfab/search", handleSketchfabSearch);
+  app.get("/api/sketchfab/download/:modelId", handleSketchfabDownload);
+  app.get("/api/sketchfab/viewer/:modelId", handleSketchfabViewer);
 
   return app;
 }
