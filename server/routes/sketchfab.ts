@@ -20,8 +20,14 @@ export const handleSketchfabSearch: RequestHandler = async (req, res) => {
 
     const apiToken = process.env.SKETCHFAB_API_TOKEN;
     if (!apiToken) {
-      // Fallback if API key not configured
-      res.status(400).json({ error: "Sketchfab API not configured" });
+      console.warn("Sketchfab API token not configured");
+      // Return mock data for development
+      res.json({
+        organism: searchTerm,
+        models: [],
+        count: 0,
+        message: "Sketchfab API not configured - returning empty results"
+      });
       return;
     }
 
@@ -29,36 +35,62 @@ export const handleSketchfabSearch: RequestHandler = async (req, res) => {
     const searchUrl = new URL("https://api.sketchfab.com/v2/search");
     searchUrl.searchParams.append("type", "models");
     searchUrl.searchParams.append("q", searchTerm);
-    searchUrl.searchParams.append("count", "5");
-    searchUrl.searchParams.append("downloadable", "true");
+    searchUrl.searchParams.append("count", "10");
+
+    console.log("Searching Sketchfab for:", searchTerm, "URL:", searchUrl.toString());
 
     const response = await fetch(searchUrl.toString(), {
+      method: "GET",
       headers: {
         Authorization: `Token ${apiToken}`,
+        "Accept": "application/json",
       },
     });
 
     if (!response.ok) {
-      throw new Error(`Sketchfab API error: ${response.statusText}`);
+      const errorText = await response.text();
+      console.error(`Sketchfab API error: ${response.statusText}`, errorText);
+      throw new Error(`Sketchfab API error: ${response.statusText} - ${errorText}`);
     }
 
     const data = await response.json();
-    const models: SketchfabModel[] = (data.results || []).map((model: any) => ({
+    console.log(`Sketchfab response status: ${response.status}`, data);
+
+    if (!data.results) {
+      console.warn(`No results from Sketchfab for "${searchTerm}"`, data);
+      res.json({
+        organism: searchTerm,
+        models: [],
+        count: 0,
+        message: "No models found on Sketchfab"
+      });
+      return;
+    }
+
+    const models: SketchfabModel[] = data.results.map((model: any) => ({
       uid: model.uid,
       name: model.name,
       thumbnail: model.thumbnails?.[0]?.url || "",
       downloadUrl: `https://sketchfab.com/models/${model.uid}`,
     }));
 
+    console.log(`Found ${models.length} models for "${searchTerm}"`);
     res.json({
       organism: searchTerm,
       models,
       count: models.length,
     });
   } catch (error) {
-    console.error("Sketchfab search error:", error);
-    res.status(500).json({
-      error: "Failed to search Sketchfab models",
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    console.error("Sketchfab search error:", errorMessage, String(error));
+
+    // Return empty results instead of error to allow fallback
+    res.status(200).json({
+      organism: searchTerm,
+      models: [],
+      count: 0,
+      error: errorMessage,
+      message: "Sketchfab API unavailable, using procedural models"
     });
   }
 };

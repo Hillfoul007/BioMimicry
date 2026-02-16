@@ -35,21 +35,30 @@ export function useSketchfabModels(organism?: string) {
           `/api/sketchfab/search?organism=${encodeURIComponent(organism)}`
         );
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch models");
-        }
+        const data = await response.json();
 
-        const data: SketchfabResponse = await response.json();
-        setModels(data.models);
-        
-        // Auto-select first model if available
-        if (data.models.length > 0) {
-          setSelectedModel(data.models[0]);
+        // Handle both 200 and error status codes
+        if (response.ok || response.status === 200) {
+          const modelList = data.models || [];
+          setModels(modelList);
+          setError(null);
+
+          // Auto-select first model if available
+          if (modelList.length > 0) {
+            setSelectedModel(modelList[0]);
+          } else {
+            setSelectedModel(null);
+          }
+        } else {
+          const errorMsg = data.error || `HTTP ${response.status}`;
+          throw new Error(errorMsg);
         }
       } catch (err) {
         const message = err instanceof Error ? err.message : "Unknown error";
-        setError(message);
-        console.error("Sketchfab fetch error:", err);
+        console.warn("Sketchfab search will use procedural models:", message);
+        setError(null); // Don't show error to user, just use procedural
+        setModels([]);
+        setSelectedModel(null);
       } finally {
         setLoading(false);
       }

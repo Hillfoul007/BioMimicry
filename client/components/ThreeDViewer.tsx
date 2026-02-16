@@ -628,7 +628,7 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
       if (!model) return;
 
       // Try Sketchfab first if model is available
-      if (selectedModel) {
+      if (selectedModel && selectedModel.uid) {
         try {
           // Get the model download URL
           const downloadResponse = await fetch(
@@ -636,16 +636,20 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
           );
           const downloadData = await downloadResponse.json();
 
-          if (downloadData.glbUrl) {
+          if (downloadData?.glbUrl) {
             // Load GLB from Sketchfab
             const loader = new GLTFLoader();
+
             loader.load(
               downloadData.glbUrl,
               (gltf) => {
+                // Clear previous model
+                model.clear();
+
                 const sketchfabModel = gltf.scene;
 
                 // Scale and position the model
-                sketchfabModel.scale.set(3, 3, 3);
+                sketchfabModel.scale.set(2, 2, 2);
                 sketchfabModel.traverse((node) => {
                   if (node instanceof THREE.Mesh) {
                     node.castShadow = true;
@@ -655,11 +659,11 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
 
                 model.add(sketchfabModel);
                 setModelLoaded(true);
-                return;
               },
               undefined,
               (error) => {
-                console.warn("Failed to load Sketchfab model, using fallback:", error);
+                console.warn("Failed to load Sketchfab GLB, using fallback:", error);
+                model.clear();
                 createOrganismModel();
               }
             );
@@ -667,7 +671,7 @@ export default function ThreeDViewer({ variant, organism }: ThreeDViewerProps) {
             createOrganismModel();
           }
         } catch (error) {
-          console.warn("Sketchfab load error, using fallback:", error);
+          console.warn("Sketchfab API error, using fallback:", error);
           createOrganismModel();
         }
       } else {
