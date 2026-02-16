@@ -22,9 +22,18 @@ import {
   Camera,
   FileDown,
   Smartphone,
+  Sparkles,
+  ArrowRight,
+  CheckCircle2,
+  AlertCircle,
 } from "lucide-react";
 import { organisms, problemExamples, BiologicalSolution } from "@shared/organisms";
-import { generatePDFReport, downloadSTL, generateShareLink, copyToClipboard } from "@/lib/export";
+import {
+  generatePDFReport,
+  downloadSTL,
+  generateShareLink,
+  copyToClipboard,
+} from "@/lib/export";
 
 interface Solution extends BiologicalSolution {
   relevanceScore: number;
@@ -82,55 +91,58 @@ export default function Architect() {
   };
 
   const handleAnalyze = async () => {
-    if (!challenge.trim() && !file) {
+    if (!challenge.trim()) {
+      toast.error("Please describe your engineering challenge");
       return;
     }
 
     setIsAnalyzing(true);
-    setGenerationStep(1);
+    setGenerationStep(0);
     setSolutions(null);
 
-    // Simulate AI processing with stages
-    const stages = [1, 2, 3, 4, 5];
-    for (const stage of stages) {
-      await new Promise((resolve) => setTimeout(resolve, 600));
-      setGenerationStep(stage);
+    try {
+      // Call API with real AI matching
+      const response = await fetch("/api/biomimicry/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ challenge }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to analyze challenge");
+      }
+
+      // Simulate processing steps for visual feedback
+      const stages = [1, 2, 3, 4, 5];
+      for (const stage of stages) {
+        await new Promise((resolve) => setTimeout(resolve, 400));
+        setGenerationStep(stage);
+      }
+
+      const data = await response.json();
+      setSolutions(data.solutions as Solution[]);
+
+      toast.success(
+        `Found ${data.solutions.length} nature-inspired solutions!`
+      );
+    } catch (error) {
+      console.error("Analysis error:", error);
+      toast.error("Failed to analyze challenge. Please try again.");
+    } finally {
+      setIsAnalyzing(false);
+      setGenerationStep(0);
     }
-
-    // Calculate relevance based on challenge keywords
-    const challengeWords = challenge.toLowerCase().split(" ");
-    const scoredSolutions = organisms
-      .map((org) => {
-        let score = Math.random() * 0.3 + 0.6;
-        // Boost score if keywords match
-        if (
-          challengeWords.some((word) =>
-            org.challenge.toLowerCase().includes(word)
-          )
-        ) {
-          score += 0.15;
-        }
-        if (
-          challengeWords.some((word) =>
-            org.tags.some((tag) => tag.includes(word))
-          )
-        ) {
-          score += 0.1;
-        }
-        return { ...org, relevanceScore: Math.min(score, 0.99) };
-      })
-      .sort((a, b) => b.relevanceScore - a.relevanceScore)
-      .slice(0, 5);
-
-    setSolutions(scoredSolutions as Solution[]);
-    setIsAnalyzing(false);
-    setGenerationStep(0);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
+      if (selectedFile.size > 10 * 1024 * 1024) {
+        toast.error("File size must be less than 10MB");
+        return;
+      }
       setFile(selectedFile);
+      toast.success("Design file uploaded");
     }
   };
 
@@ -152,6 +164,7 @@ export default function Architect() {
     setExpandedId(null);
     setSelectedSolution(null);
     setShow3DViewer(false);
+    setGenerationStep(0);
   };
 
   const simulationResults: SimulationResult[] = [
@@ -184,7 +197,7 @@ export default function Architect() {
     try {
       toast.loading("Generating PDF report...", { id: "pdf-export" });
       await generatePDFReport(challenge, selectedSolution, selectedVariant);
-      toast.success("PDF report downloaded! Check your downloads folder.", {
+      toast.success("PDF report downloaded!", {
         id: "pdf-export",
       });
     } catch (error) {
@@ -202,10 +215,10 @@ export default function Architect() {
     }
     setExportingSTL(true);
     try {
-      toast.loading("Generating 3D model (STL)...", { id: "stl-export" });
+      toast.loading("Generating 3D model...", { id: "stl-export" });
       const variant = selectedSolution.designVariants[selectedVariant];
       downloadSTL(selectedSolution.organism, variant.name);
-      toast.success("3D model ready for printing! Download started.", {
+      toast.success("3D model ready for 3D printing!", {
         id: "stl-export",
       });
     } catch (error) {
@@ -232,15 +245,13 @@ export default function Architect() {
           text: shareText,
           url: shareLink,
         });
-        toast.success("Solution shared successfully!");
+        toast.success("Solution shared!");
       } catch (error) {
         if ((error as Error).name !== "AbortError") {
           console.error("Share error:", error);
-          toast.error("Failed to share");
         }
       }
     } else {
-      // Fallback: copy to clipboard
       try {
         await copyToClipboard(shareLink);
         toast.success("Share link copied to clipboard!");
@@ -252,91 +263,114 @@ export default function Architect() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-slate-50 to-slate-100">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
       <Header />
 
-      <div className="py-12 px-4">
-        <div className="container mx-auto max-w-6xl">
+      <div className="py-16 px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto max-w-7xl">
           {/* Input Section */}
           {!solutions && (
-            <div className="mb-12">
-              <div className="bg-white rounded-2xl border border-border p-8 shadow-lg">
-                <h1 className="text-3xl font-bold text-foreground mb-2">
-                  Design Challenge Analyzer
+            <div className="space-y-8">
+              {/* Hero Section */}
+              <div className="text-center space-y-4 mb-12">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
+                  <Sparkles className="w-4 h-4" />
+                  <span className="text-sm font-medium">AI-Powered Analysis</span>
+                </div>
+                <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">
+                  Nature-Inspired Solutions
+                  <br />
+                  <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                    for Engineering Challenges
+                  </span>
                 </h1>
-                <p className="text-muted-foreground mb-8">
-                  Describe your engineering problem to discover nature-inspired
-                  solutions powered by AI
+                <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+                  Describe your problem and discover proven solutions from nature.
+                  Our AI analyzes your challenge and finds the best biomimetic approaches.
                 </p>
+              </div>
 
+              {/* Main Input Card */}
+              <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-8 shadow-2xl">
                 {/* Quick Examples */}
                 <div className="mb-8">
-                  <label className="block text-sm font-semibold text-foreground mb-3">
-                    Quick Examples
+                  <label className="block text-sm font-semibold text-slate-200 mb-4">
+                    Popular Challenges
                   </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {problemExamples.map((example) => (
                       <button
                         key={example.title}
                         onClick={() => setChallenge(example.description)}
-                        className="text-left p-3 rounded-lg border border-border hover:bg-slate-50 hover:border-primary transition-all group"
+                        className="group relative overflow-hidden text-left p-4 rounded-xl border border-slate-700/50 bg-slate-700/20 hover:bg-slate-700/40 hover:border-primary/50 transition-all duration-300"
                       >
-                        <p className="text-lg mb-1">{example.icon}</p>
-                        <p className="font-medium text-foreground text-sm">
-                          {example.title}
-                        </p>
-                        <p className="text-xs text-muted-foreground group-hover:text-primary transition-colors">
-                          {example.description}
-                        </p>
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="relative">
+                          <p className="text-2xl mb-1 group-hover:scale-110 transition-transform">
+                            {example.icon}
+                          </p>
+                          <p className="font-semibold text-slate-100 group-hover:text-white transition-colors">
+                            {example.title}
+                          </p>
+                          <p className="text-xs text-slate-400 group-hover:text-slate-300 transition-colors mt-1">
+                            {example.description}
+                          </p>
+                        </div>
                       </button>
                     ))}
                   </div>
                 </div>
 
                 {/* Challenge Input */}
-                <div className="space-y-4 mb-6">
+                <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-semibold text-foreground mb-2">
+                    <label className="block text-sm font-semibold text-slate-200 mb-3">
                       Describe Your Challenge
                     </label>
-                    <div className="flex gap-2">
+                    <div className="relative">
                       <textarea
                         value={challenge}
                         onChange={(e) => setChallenge(e.target.value)}
-                        placeholder="Describe your engineering problem... e.g., 'Design a building cooling system that uses minimal energy'"
-                        className="flex-1 h-24 px-4 py-3 rounded-lg border border-input bg-white text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                        placeholder="e.g., 'Design a building cooling system that uses minimal energy while maintaining comfort'..."
+                        className="w-full h-28 px-4 py-3 rounded-xl border border-slate-700/50 bg-slate-700/30 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none transition-all"
                       />
                       <button
                         onClick={handleVoiceInput}
-                        className={`px-4 py-3 rounded-lg border transition-all ${
+                        className={`absolute right-3 top-3 p-2 rounded-lg transition-all ${
                           isListening
-                            ? "bg-primary text-white border-primary"
-                            : "border-input bg-white text-foreground hover:bg-slate-50"
+                            ? "bg-primary text-white"
+                            : "bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-slate-200"
                         }`}
-                        title="Voice input"
+                        title="Voice input (click to speak)"
                       >
                         <Mic className="w-5 h-5" />
                       </button>
                     </div>
                     {isListening && (
-                      <p className="text-sm text-primary mt-2 flex items-center gap-2">
-                        <span className="animate-pulse">●</span> Listening...
-                      </p>
+                      <div className="flex items-center gap-2 mt-2 text-primary text-sm">
+                        <span className="animate-pulse">●</span>
+                        <span>Listening to your challenge...</span>
+                      </div>
                     )}
+                    <p className="text-xs text-slate-500 mt-2">
+                      Be specific about the problem, constraints, and desired outcomes
+                    </p>
                   </div>
 
                   {/* File Upload */}
                   <div>
-                    <label className="block text-sm font-semibold text-foreground mb-2">
+                    <label className="block text-sm font-semibold text-slate-200 mb-3">
                       Upload Design Files (Optional)
                     </label>
-                    <label className="flex items-center justify-center w-full px-4 py-6 rounded-lg border-2 border-dashed border-border bg-slate-50 hover:bg-slate-100 cursor-pointer transition-colors">
+                    <label className="group relative flex flex-col items-center justify-center w-full px-6 py-8 rounded-xl border-2 border-dashed border-slate-700/50 bg-slate-700/20 hover:bg-slate-700/30 hover:border-primary/50 cursor-pointer transition-all duration-300">
                       <div className="text-center">
-                        <Upload className="w-8 h-8 text-primary mx-auto mb-2" />
-                        <p className="text-sm font-medium text-foreground">
-                          {file ? file.name : "Click to upload or drag and drop"}
+                        <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-primary/20 transition-colors">
+                          <Upload className="w-6 h-6 text-primary" />
+                        </div>
+                        <p className="text-sm font-semibold text-slate-200 group-hover:text-white transition-colors">
+                          {file ? file.name : "Click to upload or drag files"}
                         </p>
-                        <p className="text-xs text-muted-foreground mt-1">
+                        <p className="text-xs text-slate-500 mt-1">
                           PNG, JPG, PDF, DWG (max 10MB)
                         </p>
                       </div>
@@ -348,67 +382,72 @@ export default function Architect() {
                       />
                     </label>
                   </div>
-                </div>
 
-                {/* Action Buttons */}
-                <button
-                  onClick={handleAnalyze}
-                  disabled={isAnalyzing || (!challenge.trim() && !file)}
-                  className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white font-semibold rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                >
-                  {isAnalyzing ? (
-                    <>
-                      <Zap className="w-4 h-4 animate-spin" />
-                      Analyzing...
-                    </>
-                  ) : (
-                    <>
-                      <Zap className="w-4 h-4" />
-                      Analyze & Generate Solutions
-                    </>
-                  )}
-                </button>
+                  {/* Action Buttons */}
+                  <div className="flex gap-3 pt-4">
+                    <button
+                      onClick={handleAnalyze}
+                      disabled={isAnalyzing || !challenge.trim()}
+                      className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-primary/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 group"
+                    >
+                      {isAnalyzing ? (
+                        <>
+                          <Zap className="w-4 h-4 animate-spin" />
+                          Analyzing Challenge...
+                        </>
+                      ) : (
+                        <>
+                          <Zap className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                          Find Nature-Inspired Solutions
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
               </div>
 
-              {/* Generation Steps */}
+              {/* Processing Steps */}
               {isAnalyzing && generationStep > 0 && (
-                <div className="mt-8 bg-white rounded-xl border border-border p-6">
-                  <h3 className="font-semibold text-foreground mb-4">
+                <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl border border-slate-700/50 p-6 space-y-4">
+                  <h3 className="font-semibold text-white flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-primary" />
                     AI Processing Pipeline
                   </h3>
                   <div className="space-y-3">
                     {[
                       { step: 1, label: "Parsing Challenge", icon: "📝" },
                       { step: 2, label: "Searching Biology Database", icon: "🔍" },
-                      { step: 3, label: "Matching Organisms", icon: "🧬" },
-                      {
-                        step: 4,
-                        label: "Generating Design Variants",
-                        icon: "⚙️",
-                      },
-                      { step: 5, label: "Calculating Metrics", icon: "📊" },
+                      { step: 3, label: "Semantic Analysis", icon: "🧬" },
+                      { step: 4, label: "Ranking Solutions", icon: "⚙️" },
+                      { step: 5, label: "Generating Report", icon: "📊" },
                     ].map((item) => (
                       <div key={item.step} className="flex items-center gap-3">
                         <div
                           className={`w-8 h-8 rounded-full flex items-center justify-center font-bold transition-all ${
                             generationStep >= item.step
-                              ? "bg-primary text-white"
-                              : "bg-muted text-muted-foreground"
+                              ? "bg-primary text-slate-950"
+                              : "bg-slate-700/50 text-slate-400"
                           }`}
                         >
-                          {generationStep > item.step ? "✓" : item.icon}
+                          {generationStep > item.step ? (
+                            <CheckCircle2 className="w-4 h-4" />
+                          ) : (
+                            item.icon
+                          )}
                         </div>
                         <span
-                          className={`text-sm font-medium ${
+                          className={`text-sm font-medium transition-colors ${
                             generationStep >= item.step
-                              ? "text-foreground"
-                              : "text-muted-foreground"
+                              ? "text-slate-100"
+                              : "text-slate-500"
                           }`}
                         >
                           {item.label}
                         </span>
                         {generationStep === item.step && (
-                          <span className="animate-pulse ml-auto">●</span>
+                          <span className="animate-pulse ml-auto text-primary">
+                            ●
+                          </span>
                         )}
                       </div>
                     ))}
@@ -420,311 +459,249 @@ export default function Architect() {
 
           {/* Solutions Section */}
           {solutions && (
-            <div className="space-y-6 animate-slide-up">
+            <div className="space-y-6 animate-fade-in">
+              {/* Results Header */}
               <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-2xl font-bold text-foreground mb-2">
+                <div className="space-y-2">
+                  <h2 className="text-3xl font-bold text-white">
                     Nature-Inspired Solutions
                   </h2>
-                  <p className="text-muted-foreground">
-                    {solutions.length} biomimetic solutions ranked by relevance
+                  <p className="text-slate-400">
+                    {solutions.length} biomimetic solutions ranked by AI relevance
                   </p>
                 </div>
                 <button
                   onClick={reset}
-                  className="px-4 py-2 border border-border bg-white text-foreground font-semibold rounded-lg hover:bg-slate-50 transition-all"
+                  className="px-4 py-2 rounded-lg border border-slate-700/50 bg-slate-800/50 text-slate-300 font-semibold hover:bg-slate-700/50 hover:border-primary/50 transition-all flex items-center gap-2"
                 >
                   <RotateCw className="w-4 h-4" />
+                  New Search
                 </button>
               </div>
 
               {/* Solutions Cards */}
-              {solutions.map((solution) => (
-                <div
-                  key={solution.id}
-                  className="bg-white rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all"
-                >
-                  {/* Solution Header */}
-                  <button
-                    onClick={() => toggleExpanded(solution.id)}
-                    className="w-full px-6 py-5 flex items-start justify-between hover:bg-slate-50 transition-colors text-left"
+              <div className="space-y-4">
+                {solutions.map((solution) => (
+                  <div
+                    key={solution.id}
+                    className="group bg-slate-800/50 backdrop-blur-xl rounded-xl border border-slate-700/50 overflow-hidden hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300"
                   >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-bold text-foreground">
-                          {solution.organism}
-                        </h3>
-                        <span className="inline-block px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
-                          {solution.category}
-                        </span>
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        <em>{solution.scientificName}</em>
-                      </p>
-                      <p className="text-sm text-foreground">
-                        <strong>Challenge:</strong> {solution.challenge}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <p className="text-xs text-muted-foreground">Relevance</p>
-                        <p className="text-2xl font-bold text-primary">
-                          {Math.round(solution.relevanceScore * 100)}%
+                    {/* Solution Header */}
+                    <button
+                      onClick={() => toggleExpanded(solution.id)}
+                      className="w-full px-6 py-5 flex items-start justify-between hover:bg-slate-700/20 transition-colors text-left"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 mb-2 flex-wrap">
+                          <h3 className="text-lg font-bold text-white">
+                            {solution.organism}
+                          </h3>
+                          <span className="inline-block px-3 py-1 rounded-full bg-primary/20 text-primary text-xs font-semibold border border-primary/30">
+                            {solution.category}
+                          </span>
+                          <span className="inline-block px-3 py-1 rounded-full bg-secondary/20 text-secondary text-xs font-semibold border border-secondary/30">
+                            {Math.round(solution.relevanceScore * 100)}% Match
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-500 mb-2 italic">
+                          {solution.scientificName}
                         </p>
-                      </div>
-                      {expandedId === solution.id ? (
-                        <ChevronUp className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-                      )}
-                    </div>
-                  </button>
-
-                  {/* Solution Details */}
-                  {expandedId === solution.id && (
-                    <div className="border-t border-border px-6 py-5 bg-slate-50 space-y-6">
-                      {/* Mechanism */}
-                      <div>
-                        <h4 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
-                          <Lightbulb className="w-4 h-4 text-accent" />
-                          How Nature Solves It
-                        </h4>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          {solution.mechanism}
+                        <p className="text-sm text-slate-300">
+                          <span className="font-semibold text-slate-200">
+                            Challenge:
+                          </span>{" "}
+                          {solution.challenge}
                         </p>
                       </div>
 
-                      {/* Advantages */}
-                      <div>
-                        <h4 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
-                          <TrendingUp className="w-4 h-4 text-accent" />
-                          Key Advantages
-                        </h4>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          {solution.advantage}
-                        </p>
-                      </div>
-
-                      {/* Design Variants */}
-                      <div>
-                        <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-                          <Box className="w-4 h-4 text-accent" />
-                          Design Variants
-                        </h4>
-                        <div className="space-y-3">
-                          {solution.designVariants.map((variant, idx) => (
-                            <button
-                              key={idx}
-                              onClick={() => setSelectedVariant(idx)}
-                              className={`w-full text-left p-3 rounded-lg border transition-all ${
-                                selectedVariant === idx
-                                  ? "border-primary bg-primary/5"
-                                  : "border-border hover:border-primary/50"
-                              }`}
-                            >
-                              <p className="font-medium text-foreground">
-                                {variant.name}
-                              </p>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                {variant.description}
-                              </p>
-                              <div className="flex flex-wrap gap-1 mt-2">
-                                {variant.specs.map((spec, i) => (
-                                  <span
-                                    key={i}
-                                    className="text-xs bg-white px-2 py-1 rounded border border-border"
-                                  >
-                                    {spec}
-                                  </span>
-                                ))}
-                              </div>
-                            </button>
-                          ))}
+                      <div className="flex items-center gap-4 ml-4 flex-shrink-0">
+                        <div className="text-right hidden sm:block">
+                          <p className="text-xs text-slate-500">AI Score</p>
+                          <p className="text-2xl font-bold text-primary">
+                            {Math.round(solution.relevanceScore * 100)}%
+                          </p>
                         </div>
+                        {expandedId === solution.id ? (
+                          <ChevronUp className="w-5 h-5 text-slate-500 flex-shrink-0" />
+                        ) : (
+                          <ChevronDown className="w-5 h-5 text-slate-500 flex-shrink-0 group-hover:text-primary transition-colors" />
+                        )}
                       </div>
+                    </button>
 
-                      {/* Performance Metrics */}
-                      <div>
-                        <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-                          <ZapIcon className="w-4 h-4 text-accent" />
-                          Biomimetic Performance Metrics
-                        </h4>
-                        <div className="grid grid-cols-3 gap-3">
-                          {[
-                            {
-                              name: "Efficiency",
-                              value: solution.metrics.efficiency,
-                            },
-                            {
-                              name: "Sustainability",
-                              value: solution.metrics.sustainability,
-                            },
-                            {
-                              name: "Manufacturability",
-                              value: solution.metrics.manufacturability,
-                            },
-                          ].map((metric) => (
-                            <div key={metric.name}>
-                              <p className="text-xs font-semibold text-foreground mb-1">
-                                {metric.name}
-                              </p>
-                              <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
-                                <div
-                                  className="h-full bg-gradient-to-r from-primary to-secondary transition-all"
-                                  style={{
-                                    width: `${metric.value * 100}%`,
-                                  }}
-                                />
-                              </div>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                {Math.round(metric.value * 100)}%
-                              </p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Quick Simulation */}
-                      <div>
-                        <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-                          <Play className="w-4 h-4 text-accent" />
-                          Performance Simulation (vs Traditional)
-                        </h4>
-                        <div className="space-y-3">
-                          {simulationResults.map((result, idx) => (
-                            <div key={idx}>
-                              <div className="flex justify-between items-center mb-1">
-                                <p className="text-xs font-medium text-foreground">
-                                  {result.metric}
-                                </p>
-                                <p className="text-xs font-bold text-secondary">
-                                  {result.improvement}
-                                </p>
-                              </div>
-                              <div className="flex gap-1">
-                                <div className="flex-1 h-4 bg-slate-300 rounded-full overflow-hidden">
-                                  <div
-                                    className="h-full bg-slate-500"
-                                    style={{
-                                      width: `${result.traditional}%`,
-                                    }}
-                                  />
-                                </div>
-                                <div className="flex-1 h-4 bg-slate-300 rounded-full overflow-hidden">
-                                  <div
-                                    className="h-full bg-gradient-to-r from-primary to-secondary"
-                                    style={{
-                                      width: `${result.biomimetic}%`,
-                                    }}
-                                  />
-                                </div>
-                              </div>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                Traditional: {result.traditional}% | Biomimetic:{" "}
-                                {result.biomimetic}%
-                              </p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Comparison View */}
-                      <div>
-                        <h4 className="text-sm font-semibold text-foreground mb-3">
-                          Biological Inspiration vs. Engineering Solution
-                        </h4>
-                        <ComparisonView solution={solution} variant={selectedVariant} />
-                      </div>
-
-                      {/* 3D Visualization Viewer */}
-                      {show3DViewer && (
-                        <div>
-                          <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-                            <Box className="w-4 h-4 text-accent" />
-                            3D Model Visualization
+                    {/* Expanded Details */}
+                    {expandedId === solution.id && (
+                      <div className="border-t border-slate-700/50 px-6 py-6 bg-slate-900/30 space-y-6">
+                        {/* How Nature Solves It */}
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-semibold text-slate-100 flex items-center gap-2">
+                            <Lightbulb className="w-4 h-4 text-accent" />
+                            How Nature Solves It
                           </h4>
-                          <ThreeDViewer
-                            organism={solution.organism}
-                            variant={solution.designVariants[selectedVariant]?.name}
+                          <p className="text-sm text-slate-300 leading-relaxed">
+                            {solution.mechanism}
+                          </p>
+                        </div>
+
+                        {/* Key Advantages */}
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-semibold text-slate-100 flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-accent" />
+                            Key Advantages
+                          </h4>
+                          <p className="text-sm text-slate-300 leading-relaxed">
+                            {solution.advantage}
+                          </p>
+                        </div>
+
+                        {/* Performance Metrics */}
+                        <div className="space-y-3">
+                          <h4 className="text-sm font-semibold text-slate-100 flex items-center gap-2">
+                            <ZapIcon className="w-4 h-4 text-accent" />
+                            Biomimetic Performance
+                          </h4>
+                          <div className="grid grid-cols-3 gap-3">
+                            {[
+                              {
+                                name: "Efficiency",
+                                value: solution.metrics.efficiency,
+                              },
+                              {
+                                name: "Sustainability",
+                                value: solution.metrics.sustainability,
+                              },
+                              {
+                                name: "Manufacturability",
+                                value: solution.metrics.manufacturability,
+                              },
+                            ].map((metric) => (
+                              <div key={metric.name} className="space-y-1">
+                                <p className="text-xs font-semibold text-slate-300">
+                                  {metric.name}
+                                </p>
+                                <div className="w-full h-2 bg-slate-700/50 rounded-full overflow-hidden">
+                                  <div
+                                    className="h-full bg-gradient-to-r from-primary to-secondary transition-all duration-500"
+                                    style={{
+                                      width: `${metric.value * 100}%`,
+                                    }}
+                                  />
+                                </div>
+                                <p className="text-xs text-slate-500">
+                                  {Math.round(metric.value * 100)}%
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Design Variants */}
+                        <div className="space-y-3">
+                          <h4 className="text-sm font-semibold text-slate-100 flex items-center gap-2">
+                            <Box className="w-4 h-4 text-accent" />
+                            Design Variants
+                          </h4>
+                          <div className="space-y-2">
+                            {solution.designVariants.map((variant, idx) => (
+                              <button
+                                key={idx}
+                                onClick={() => setSelectedVariant(idx)}
+                                className={`w-full text-left p-3 rounded-lg border transition-all ${
+                                  selectedVariant === idx
+                                    ? "border-primary bg-primary/10 ring-2 ring-primary/20"
+                                    : "border-slate-700/50 bg-slate-700/20 hover:border-primary/50 hover:bg-slate-700/30"
+                                }`}
+                              >
+                                <p className="font-medium text-slate-100">
+                                  {variant.name}
+                                </p>
+                                <p className="text-xs text-slate-400 mt-1">
+                                  {variant.description}
+                                </p>
+                                <div className="flex flex-wrap gap-1.5 mt-2">
+                                  {variant.specs.slice(0, 2).map((spec, i) => (
+                                    <span
+                                      key={i}
+                                      className="text-xs bg-slate-700/50 text-slate-300 px-2 py-1 rounded border border-slate-600/50"
+                                    >
+                                      {spec}
+                                    </span>
+                                  ))}
+                                  {variant.specs.length > 2 && (
+                                    <span className="text-xs text-slate-500 px-2 py-1">
+                                      +{variant.specs.length - 2} more
+                                    </span>
+                                  )}
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Comparison View */}
+                        <div className="space-y-3">
+                          <h4 className="text-sm font-semibold text-slate-100">
+                            Biological vs Engineering Implementation
+                          </h4>
+                          <ComparisonView
+                            solution={solution}
+                            variant={selectedVariant}
                           />
                         </div>
-                      )}
 
-                      {/* Impact Dashboard */}
-                      <div className="bg-gradient-to-r from-accent/10 to-secondary/10 rounded-lg p-4">
-                        <h4 className="text-sm font-semibold text-foreground mb-3">
-                          Impact Summary
-                        </h4>
-                        <div className="grid grid-cols-3 gap-3">
-                          <div className="text-center">
-                            <p className="text-2xl font-bold text-primary">35%</p>
-                            <p className="text-xs text-muted-foreground">
-                              Cost Savings
-                            </p>
+                        {/* 3D Visualization */}
+                        {show3DViewer && (
+                          <div className="space-y-3">
+                            <h4 className="text-sm font-semibold text-slate-100 flex items-center gap-2">
+                              <Box className="w-4 h-4 text-accent" />
+                              3D Model Visualization
+                            </h4>
+                            <ThreeDViewer
+                              organism={solution.organism}
+                              variant={
+                                solution.designVariants[selectedVariant]?.name
+                              }
+                            />
                           </div>
-                          <div className="text-center">
-                            <p className="text-2xl font-bold text-secondary">
-                              92%
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              Sustainability
-                            </p>
-                          </div>
-                          <div className="text-center">
-                            <p className="text-2xl font-bold text-accent">
-                              8/10
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              Manufacturability
-                            </p>
-                          </div>
+                        )}
+
+                        {/* Action Buttons */}
+                        <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-700/50">
+                          <button
+                            onClick={() => setShow3DViewer(!show3DViewer)}
+                            className="flex-1 min-w-max px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-primary/30 transition-all text-sm flex items-center justify-center gap-2"
+                          >
+                            <Box className="w-4 h-4" />
+                            {show3DViewer ? "Hide" : "View"} 3D Model
+                          </button>
+                          <button
+                            onClick={handleExportPDF}
+                            disabled={exportingPDF}
+                            className="flex-1 min-w-max px-4 py-2 border border-slate-700/50 bg-slate-700/20 text-slate-200 font-semibold rounded-lg hover:bg-slate-700/40 hover:border-primary/50 transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+                          >
+                            <Download className="w-4 h-4" />
+                            {exportingPDF ? "Generating..." : "Export PDF"}
+                          </button>
+                          <button
+                            onClick={handleExportSTL}
+                            disabled={exportingSTL}
+                            className="flex-1 min-w-max px-4 py-2 border border-slate-700/50 bg-slate-700/20 text-slate-200 font-semibold rounded-lg hover:bg-slate-700/40 hover:border-primary/50 transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+                          >
+                            <FileDown className="w-4 h-4" />
+                            {exportingSTL ? "Generating..." : "Export STL"}
+                          </button>
+                          <button
+                            onClick={handleShare}
+                            className="px-4 py-2 border border-slate-700/50 bg-slate-700/20 text-slate-200 font-semibold rounded-lg hover:bg-slate-700/40 hover:border-primary/50 transition-all text-sm flex items-center justify-center gap-2"
+                          >
+                            <Share2 className="w-4 h-4" />
+                          </button>
                         </div>
                       </div>
-
-                      {/* Action Buttons */}
-                      <div className="flex flex-wrap gap-2 pt-4 border-t border-border">
-                        <button
-                          onClick={() => setShow3DViewer(!show3DViewer)}
-                          className="flex-1 min-w-max px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white font-semibold rounded-lg hover:shadow-lg transition-all text-sm flex items-center justify-center gap-2"
-                        >
-                          <Box className="w-4 h-4" />
-                          {show3DViewer ? "Hide" : "View"} 3D
-                        </button>
-                        <button
-                          onClick={handleExportSTL}
-                          disabled={exportingSTL}
-                          className="flex-1 min-w-max px-4 py-2 border border-border bg-white text-foreground font-semibold rounded-lg hover:bg-slate-100 transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-50"
-                        >
-                          <FileDown className="w-4 h-4" />
-                          {exportingSTL ? "Exporting..." : "STL"}
-                        </button>
-                        <button
-                          onClick={handleExportPDF}
-                          disabled={exportingPDF}
-                          className="flex-1 min-w-max px-4 py-2 border border-border bg-white text-foreground font-semibold rounded-lg hover:bg-slate-100 transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-50"
-                        >
-                          <Download className="w-4 h-4" />
-                          {exportingPDF ? "Exporting..." : "PDF"}
-                        </button>
-                        <button
-                          onClick={() => setShowARPreview(true)}
-                          className="flex-1 min-w-max px-4 py-2 border border-border bg-white text-foreground font-semibold rounded-lg hover:bg-slate-100 transition-all text-sm flex items-center justify-center gap-2"
-                        >
-                          <Smartphone className="w-4 h-4" />
-                          AR
-                        </button>
-                        <button
-                          onClick={handleShare}
-                          className="px-4 py-2 border border-border bg-white text-foreground font-semibold rounded-lg hover:bg-slate-100 transition-all text-sm"
-                        >
-                          <Share2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
+                    )}
+                  </div>
+                ))}
+              </div>
 
               {/* AR Preview Modal */}
               {showARPreview && (
@@ -737,46 +714,17 @@ export default function Architect() {
                   onClose={() => setShowARPreview(false)}
                 />
               )}
-
-              {/* Coming Soon Section */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl border border-blue-200 p-6">
-                  <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
-                    <Box className="w-5 h-5" />
-                    Advanced 3D Editor
-                  </h3>
-                  <p className="text-muted-foreground text-sm mb-4">
-                    Real-time editing and optimization of 3D models with physics
-                    simulation
-                  </p>
-                  <button className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all text-sm">
-                    Coming Soon
-                  </button>
-                </div>
-
-                <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-200 p-6">
-                  <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5" />
-                    AI Optimization
-                  </h3>
-                  <p className="text-muted-foreground text-sm mb-4">
-                    Automatically optimize designs based on constraints and
-                    performance goals
-                  </p>
-                  <button className="px-4 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-all text-sm">
-                    Coming Soon
-                  </button>
-                </div>
-              </div>
             </div>
           )}
 
           {/* Empty State */}
           {!solutions && !isAnalyzing && (
-            <div className="text-center py-12">
-              <Leaf className="w-16 h-16 text-primary/30 mx-auto mb-4" />
-              <p className="text-muted-foreground">
-                Upload a challenge to get started with nature-inspired solutions
+            <div className="text-center py-20">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Leaf className="w-8 h-8 text-primary" />
+              </div>
+              <p className="text-slate-400 text-lg">
+                Describe your engineering challenge to discover nature-inspired solutions
               </p>
             </div>
           )}
